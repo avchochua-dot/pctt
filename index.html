@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="theme-color" content="#071b2d" />
-<title>AVC HYDRO MONITOR V9.1 | Trực quan liên hồ Vu Gia – Thu Bồn</title>
+<title>AVC HYDRO MONITOR V9.2.4 PUBLIC | Trực quan liên hồ Vu Gia – Thu Bồn</title>
 <style>
 :root{
   color-scheme:dark;
@@ -388,12 +388,59 @@ button:disabled{cursor:not-allowed;opacity:.5}
 @media(max-width:1100px){.v91-control-bar{flex-wrap:wrap;justify-content:flex-start;gap:7px 13px}.v91-control-group{flex-wrap:wrap}.v91-choice{font-size:11px}}
 @media(max-width:640px){.v91-control-bar{padding:8px;gap:8px}.v91-control-group{width:100%;white-space:normal}.v91-choice{padding:8px 9px}.v91-control-group--metrics{gap:5px}.v91-control-group--metrics .v91-choice{flex:1 1 calc(50% - 12px)}}
 </style>
+<style id="v924-gauge-card-fit">
+/* Fit the downstream cards to the adjacent reservoir cards without altering the dam SVG. */
+.gauge-header > div:first-child{min-width:0}
+.gauge-caption{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(min-width:1081px){
+ .gauge-visual{flex:0 0 auto!important;height:auto!important;aspect-ratio:1.55;min-height:230px!important;max-height:270px!important}
+ .gauge-visual svg{height:100%!important;min-height:0!important}
+}
+@media(min-width:1081px) and (max-width:1400px){.gauge-name{font-size:15px}}
+</style>
+
+<style id="v925-layout-no-empty-space">
+/* V9.2.5: geometry and all SVGs unchanged.  Keep the three reservoir blocks
+   together at 100% zoom instead of distributing spare grid-row height. */
+.res-card{justify-content:flex-start!important;}
+.res-card > .res-visual{margin-top:8px!important;margin-bottom:9px!important;}
+.res-card > .res-foot{margin-top:0!important;}
+/* Downstream cards had been increasing both grid rows.  Reclaim only padding
+   and unused vertical whitespace; keep all observation/forecast/peak data. */
+@media (min-width:1081px){
+  .gauge-card{padding:10px 12px 8px;}
+  .gauge-current{margin:4px 0 2px;}
+  .gauge-forecast{margin-top:3px;padding:4px 7px;}
+  .gauge-forecast small{margin-top:1px;font-size:9px;}
+  .gauge-visual{
+    flex:0 0 clamp(190px, 14vw, 230px)!important;
+    height:clamp(190px, 14vw, 230px)!important;
+    min-height:0!important;max-height:none!important;aspect-ratio:auto!important;
+    margin:5px 0 6px;
+  }
+  .gauge-visual svg{height:100%!important;min-height:0!important;max-height:none!important;}
+  .peak-block{padding:5px 10px;}
+  .peak-label{font-size:10px;}
+  .peak-number{font-size:20px;line-height:1.08;}
+  .peak-time{font-size:10px;}
+  .gap-peak{font-size:10px;}
+  .gap-peak b{font-size:15px;}
+  .gauge-alarms{padding:6px 2px 0;font-size:10px;}
+}
+/* When the board becomes one column, avoid inherited minimum card heights
+   creating blank areas below a diagram. */
+@media (max-width:1080px){
+  .res-card{min-height:0;}
+}
+/* Fullscreen has its own fluid layout: do not constrain river staff there. */
+.board:fullscreen .gauge-visual{flex:1 1 0%!important;height:auto!important;min-height:0!important;max-height:none!important;}
+</style>
 </head>
 <body>
 <div class="screen">
   <div class="v9-shell-header" id="siteTop">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">✦</div><div><div class="kicker">AVC · GIÁM SÁT THỦY VĂN</div><h1>Trực quan liên hồ Vu Gia – Thu Bồn</h1><div class="subtitle">4 hồ PCTT · 2 trạm hạ du Supabase · dự báo +4 giờ</div></div></div>
+      <div class="brand"><div class="brand-mark">✦</div><div><div class="kicker">AVC · GIÁM SÁT THỦY VĂN</div><h1>Trực quan liên hồ Vu Gia – Thu Bồn</h1><div class="subtitle">4 hồ · 2 trạm thủy văn · Nguồn: <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#88d9ff;text-decoration:underline;text-underline-offset:2px">PCTT Đà Nẵng</a> (hạ du qua Supabase)</div></div></div>
       <div class="top-actions"><span id="sourceBadge" class="mode-pill" title="Tình trạng đồng bộ nguồn">ĐANG KẾT NỐI...</span><button class="btn" id="refreshLiveBtn" type="button" title="Lấy dữ liệu quan trắc mới nhất">↻ Cập nhật</button><button class="btn" id="connectionBtn" type="button" title="Cấu hình API và Supabase">⚙ Cấu hình</button><button class="btn main-btn" id="fullscreenBtn" type="button" title="Phóng to tab hiện tại">⛶ Toàn màn hình</button></div>
     </header>
     <nav class="site-nav" aria-label="Điều hướng website AVC">
@@ -404,12 +451,12 @@ button:disabled{cursor:not-allowed;opacity:.5}
         <button class="site-tab" type="button" role="tab" id="tabFlood" aria-controls="view-flood" aria-selected="false" data-view="flood">⌖ Mốc lũ hạ du</button>
         <button class="site-tab" type="button" role="tab" id="tabWeather" aria-controls="view-weather" aria-selected="false" data-view="weather">☁ Thời tiết Windy</button>
       </div>
-      <div class="source-line" id="liveStatusLine" title="Chi tiết trạng thái nguồn xem tại Cấu hình"><span id="liveStatusText">Đang đồng bộ PCTT và Supabase…</span><span id="liveSyncTime">Chưa cập nhật</span></div>
+      <div class="source-line" id="liveStatusLine" title="Chi tiết trạng thái nguồn xem tại Cấu hình"><span id="liveStatusText">Đang đồng bộ số liệu từ PCTT Đà Nẵng…</span><span id="liveSyncTime">Chưa cập nhật</span></div>
     </nav>
   </div>
   <section id="connectionPanel" class="live-panel" hidden aria-label="Cấu hình nguồn dữ liệu LIVE">
     <div class="live-row" style="justify-content:space-between"><h3>Nguồn dữ liệu LIVE · API PCTT và Supabase</h3><span id="authState" class="live-help">Đang đọc nguồn công khai / chỉ đọc</span></div>
-    <div class="live-note"><strong>4 hồ:</strong> API <code>qt1865-compliance?mode=pctt-hydro</code> từ Vercel, nguồn gốc PCTT Đà Nẵng; ánh xạ theo ID 1–4. <strong>2 trạm hạ du:</strong> <code>downstream_manual_observations</code> của Supabase, có thể dự phòng qua API Vercel <code>downstream-forecast?mode=observed-history</code>. Không còn yêu cầu <code>reservoir_id</code> cho ba hồ.</div>
+    <div class="live-note"><strong>4 hồ:</strong> API <code>qt1865-compliance?mode=pctt-hydro</code> từ Vercel, nguồn gốc PCTT Đà Nẵng; ánh xạ theo ID 1–4. <strong>2 trạm hạ du:</strong> dữ liệu gốc PCTT Đà Nẵng, đồng bộ tới bảng <code>downstream_manual_observations</code> của Supabase, có thể dự phòng qua API Vercel <code>downstream-forecast?mode=observed-history</code>. Không còn yêu cầu <code>reservoir_id</code> cho ba hồ.</div>
     <div class="live-row">
       <div class="live-form-field" style="flex:1;min-width:260px"><label for="pcttBase">Địa chỉ Vercel phục vụ API (không chứa /api/...)</label><input id="pcttBase" type="url" spellcheck="false" placeholder="https://av-monitor-reservoir.vercel.app" /></div>
       <div class="live-form-field"><label for="rangeHours">Khoảng dữ liệu PCTT cần tải</label><select id="rangeHours" class="live-select"><option value="24">24 giờ</option><option value="48">48 giờ</option><option value="96" selected>96 giờ</option><option value="168">168 giờ</option></select></div>
@@ -426,13 +473,13 @@ button:disabled{cursor:not-allowed;opacity:.5}
     </div>
     <div class="live-help" id="loginNotice">Tài khoản đăng nhập và token chỉ lưu trong RAM của tab đang mở.</div>
     <div class="live-grid" id="liveDiagnostics"></div>
-    <div class="live-note">Chu kỳ cập nhật <strong>90 giây</strong>. Dữ liệu quá <strong>4 giờ</strong> được đánh dấu <strong>CŨ</strong>. Trường thời gian PCTT không kèm múi giờ được diễn giải là giờ Việt Nam; trường có <code>Z</code>/<code>+07:00</code> được giữ đúng offset. Dung tích nội suy từ Z–W, còn cửa van cung và xy lanh chỉ là mô hình minh họa, không có tín hiệu độ mở đo thực tế.</div>
+    <div class="live-note">Chu kỳ cập nhật <strong>90 giây</strong>. Dữ liệu quá <strong>4 giờ</strong> được đánh dấu <strong>CŨ</strong>. Trường thời gian PCTT không kèm múi giờ được diễn giải là giờ Việt Nam; trường có <code>Z</code>/<code>+07:00</code> được giữ đúng offset. Dung tích hữu ích và dung tích trống nội suy theo Z–W; cửa van cung và xy lanh là mô hình minh họa, không có tín hiệu độ mở đo thực tế.</div>
   </section>
 
   <section class="site-view" id="view-overview" role="tabpanel" aria-labelledby="tabOverview">
     <div class="overview" id="overview"></div>
   <section class="board" id="board" aria-label="Trực quan bốn hồ và hai trạm hạ du"><button class="btn" id="exitFullscreen">✕ Thoát toàn màn hình</button><div id="reservoirs" class="reservoirs"></div><div id="gauges" class="gauges"></div></section>
-  <footer class="bottom-note"><span><strong>Ghi chú:</strong> Dung tích nội suy từ Phụ lục II, QĐ 1865/QĐ-TTg. Ngưỡng báo động và đỉnh lũ 2025 theo thông tin bạn cung cấp. <strong>Số liệu chỉ đọc từ PCTT/Supabase. Không dùng số giả khi nguồn thiếu; tình trạng cũ/lỗi hiển thị rõ.</strong></span><span class="expand-hint">Hình cao trình đã chuẩn hóa để dễ so sánh, không biểu diễn khoảng cách theo tỷ lệ mét. Chọn “Xem chi tiết” để phóng lớn.</span></footer>
+  <footer class="bottom-note"><span><strong>Nguồn:</strong> <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#85dcff">Cổng PCTT Đà Nẵng</a> (4 hồ, 2 trạm hạ du; trạm hạ du qua Supabase). Dung tích hữu ích/trống nội suy theo Z–W, QĐ 1865/QĐ-TTg. <strong>Dữ liệu cũ/thiếu được ghi rõ.</strong></span><span class="expand-hint">Hình cao trình đã chuẩn hóa để dễ so sánh, không biểu diễn khoảng cách theo tỷ lệ mét. Chọn “Xem chi tiết” để phóng lớn.</span></footer>
   </section>
   <section class="site-view data-view" id="view-data" role="tabpanel" aria-labelledby="tabData" hidden>
     <button id="exitDataFullscreen" type="button" class="btn">✕ Thoát toàn màn hình</button>
@@ -441,7 +488,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
       <div class="data-actions"><label for="dataRange">Khoảng dữ liệu</label><select id="dataRange" aria-label="Khoảng dữ liệu theo giờ"><option value="24">24 giờ</option><option value="48">48 giờ</option><option value="96" selected>96 giờ</option><option value="168">7 ngày</option></select><button type="button" class="btn" id="exportHydroCsv">↓ Xuất CSV 4 hồ</button></div>
     </div>
     <section class="data-pane" aria-labelledby="hydroHistoryTitle">
-      <div class="data-pane-header"><div><h3 id="hydroHistoryTitle">I. Bảng số liệu 4 hồ thủy điện</h3><p>Cấu trúc cột theo báo cáo PCTT Đà Nẵng · Q về Vu Gia / Thu Bồn lấy từ số liệu lưu vực, không tự cộng lưu lượng hồ</p></div><span class="data-rowcount" id="hydroDataCount">Đang nạp dữ liệu...</span></div>
+      <div class="data-pane-header"><div><h3 id="hydroHistoryTitle">I. Bảng số liệu 4 hồ thủy điện</h3><p>Nguồn: <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#8bdcff">Cổng PCTT Đà Nẵng ↗</a> · Q về Vu Gia / Thu Bồn từ báo cáo lưu vực, không tự cộng lưu lượng hồ</p></div><span class="data-rowcount" id="hydroDataCount">Đang nạp dữ liệu...</span></div>
       <div class="data-table-frame" id="hydroTableFrame" tabindex="0" aria-label="Bảng 4 hồ, cuộn ngang để xem toàn bộ cột">
         <table class="data-table" id="hydroDataTable">
           <colgroup>
@@ -463,19 +510,19 @@ button:disabled{cursor:not-allowed;opacity:.5}
       <div class="data-legend"><span class="dot-legend" style="--dot:#9fe0ff">Mực nước hồ</span><span class="dot-legend" style="--dot:#cce8ff">Q đến hồ</span><span class="dot-legend" style="--dot:#8aefc2">Q chạy máy</span><span class="dot-legend" style="--dot:#ffd189">Q qua tràn</span><span class="dot-legend" style="--dot:#8cdbed">Q về lưu vực</span><span>— : không có bản ghi tại thời điểm đó</span></div>
     </section>
     <section class="data-pane" aria-labelledby="downHistoryTitle">
-      <div class="data-pane-header"><div><h3 id="downHistoryTitle">II. Quan trắc Hội Khách &amp; Ái Nghĩa</h3><p>Thời gian quan trắc riêng, không ép ghép với giờ báo cáo 4 hồ. Dự báo +4h hiển thị khi API mô hình trả số liệu hợp lệ.</p></div><span class="data-rowcount" id="downDataCount">Đang nạp dữ liệu...</span></div>
+      <div class="data-pane-header"><div><h3 id="downHistoryTitle">II. Quan trắc trạm thủy văn Hội Khách &amp; Ái Nghĩa</h3><p>Mực nước trạm lấy từ PCTT Đà Nẵng và đồng bộ vào Supabase. Dự báo +4h chỉ hiển thị khi mô hình trả số liệu hợp lệ.</p></div><span class="data-rowcount" id="downDataCount">Đang nạp dữ liệu...</span></div>
       <div class="data-forecast-cards" id="downForecastCards"></div>
       <div class="data-table-frame" style="max-height:350px" tabindex="0" aria-label="Bảng quan trắc hai trạm hạ du">
         <table class="data-table" id="downstreamDataTable" style="min-width:800px;width:100%">
-          <thead><tr><th class="sticky-date" rowspan="2" scope="col">Ngày</th><th class="sticky-hour" rowspan="2" scope="col">Giờ</th><th colspan="2" class="group-av" scope="colgroup">Hội Khách</th><th colspan="2" class="group-sb" scope="colgroup">Ái Nghĩa</th></tr><tr><th scope="col">Mực nước (m)</th><th scope="col">Δ3 giờ (m)</th><th scope="col">Mực nước (m)</th><th scope="col">Δ3 giờ (m)</th></tr></thead>
+          <thead><tr><th class="sticky-date" rowspan="2" scope="col">Ngày</th><th class="sticky-hour" rowspan="2" scope="col">Giờ</th><th colspan="2" class="group-av" scope="colgroup">Trạm thủy văn Hội Khách</th><th colspan="2" class="group-sb" scope="colgroup">Trạm thủy văn Ái Nghĩa</th></tr><tr><th scope="col">Mực nước (m)</th><th scope="col">Δ3 giờ (m)</th><th scope="col">Mực nước (m)</th><th scope="col">Δ3 giờ (m)</th></tr></thead>
           <tbody id="downTableBody"><tr><td colspan="6" class="data-empty">Đang tải số liệu...</td></tr></tbody>
         </table>
       </div>
-      <p class="data-endnotes">Nguồn: quan trắc Hội Khách và Ái Nghĩa từ Supabase; 4 hồ và Q về lưu vực từ API PCTT Đà Nẵng. Đơn vị m và m³/s. Số liệu trống không được điền giá trị 0. Dự báo +4h là giá trị mô hình, không phải quan trắc.</p>
+      <p class="data-endnotes">Nguồn gốc quan trắc: <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#8bdcff">PCTT Đà Nẵng ↗</a>; số liệu hạ du được đồng bộ qua Supabase; số liệu bốn hồ lấy qua API PCTT. Đơn vị m và m³/s. Số liệu trống không được điền giá trị 0. Dự báo +4h là giá trị mô hình, không phải quan trắc.</p>
     </section>
   </section>
   <section class="site-view v9-workspace" id="view-charts" role="tabpanel" aria-labelledby="tabCharts" hidden>
-    <div class="v9-title-row"><div><h2>Biểu đồ quan trắc và vận hành</h2><p>Dùng chung dữ liệu lịch sử PCTT/Supabase với tab Số liệu · không nội suy khoảng trống dữ liệu</p></div>
+    <div class="v9-title-row"><div><h2>Biểu đồ quan trắc và vận hành</h2><p>Dữ liệu 4 hồ và 2 trạm từ <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#8bdcff">PCTT Đà Nẵng ↗</a> (hạ du qua Supabase) · không nội suy mốc thiếu</p></div>
       <div class="v9-inline-tools"><label class="v9-control">Khoảng dữ liệu <select id="chartRange"><option value="24">24 giờ</option><option value="48">48 giờ</option><option value="96" selected>96 giờ</option><option value="168">7 ngày</option></select></label><button class="btn" type="button" id="chartRefresh">↻ Cập nhật biểu đồ</button></div>
     </div>
     <section class="v9-pane" aria-labelledby="chartHydroTitle"><div class="v9-title-row"><div><h3 id="chartHydroTitle">I. Diễn biến hồ thủy điện · 4 đường số liệu</h3><p>Mỗi lần xem một hồ; chọn các đường cần hiển thị ngay trên thanh ngang bên dưới.</p></div></div>
@@ -498,7 +545,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
       </div>
       <div class="v9-chart-wrap" id="hydroChart" role="img" aria-label="Bốn đường dữ liệu vận hành của hồ được chọn, hai trục mực nước và lưu lượng"><div class="v9-empty">Đang nạp lịch sử hồ từ PCTT…</div></div><div class="v91-chart-legend" id="v91ChartLegend"><span><i style="--key:#50d6ff"></i>MNH <b>(m) · trục trái</b></span><span><i style="--key:#91a5ff"></i>Q về</span><span><i style="--key:#4fe4b1"></i>Q qua máy</span><span><i style="--key:#ffc478"></i>Q qua tràn <b>(m³/s) · trục phải</b></span></div><div class="v9-stats" id="hydroChartStats"></div><div class="v9-chart-caption" id="hydroChartNote">Thời gian chuẩn GMT+7, giá trị từng giờ.</div>
     </section>
-    <section class="v9-pane" aria-labelledby="chartDownTitle"><div class="v9-title-row"><div><h3 id="chartDownTitle">II. Mực nước hạ du và dự báo +4 giờ</h3><p>Quan trắc là đường màu xanh; dự báo +4h (nếu có) dùng đường nét đứt màu tím, không phải giá trị thực đo.</p></div></div>
+    <section class="v9-pane" aria-labelledby="chartDownTitle"><div class="v9-title-row"><div><h3 id="chartDownTitle">II. Mực nước các trạm thủy văn hạ du và dự báo +4 giờ</h3><p>Quan trắc là đường màu xanh; dự báo +4h (nếu có) dùng đường nét đứt màu tím, không phải giá trị thực đo.</p></div></div>
       <div class="v91-control-bar" id="v91DownControls" role="group" aria-label="Chọn trạm và đường báo động">
         <div class="v91-control-group" role="group" aria-label="Chọn trạm hạ du"><span class="v91-group-label">TRẠM</span><button type="button" class="v91-choice v91-station is-active" data-chart-station="HOIKHACH" aria-pressed="true">Hội Khách</button><button type="button" class="v91-choice v91-station" data-chart-station="AINGHIA" aria-pressed="false">Ái Nghĩa</button></div>
         <div class="v91-control-group"><button type="button" class="v91-choice v91-alarm is-active" id="v91ToggleAlarm" aria-pressed="true">✓ Đường BĐ I–III</button></div>
@@ -530,8 +577,8 @@ button:disabled{cursor:not-allowed;opacity:.5}
 (()=>{
  'use strict';
  const CFG=JSON.parse(document.getElementById('embeddedConfig').textContent);
- const reservoirs=CFG.reservoirs.map(r=>({...r,reading:{level:null,inflow:null,turbine:null,spill:null,gate:null,delta24:null},updatedAt:null,source:'pending',lastError:null}));
- const gauges=CFG.downstream_gauges.map(g=>({...g,reading:{level:null,delta3h:null,forecast4h:null,forecast4hAt:null},updatedAt:null,source:'pending',lastError:null,forecastError:null}));
+ const reservoirs=CFG.reservoirs.map(r=>({...r,displayName:'Hồ thủy điện '+r.name,reading:{level:null,inflow:null,turbine:null,spill:null,gate:null,delta24:null},updatedAt:null,source:'pending',lastError:null}));
+ const gauges=CFG.downstream_gauges.map(g=>({...g,displayName:'Trạm thủy văn '+g.name,reading:{level:null,delta3h:null,forecast4h:null,forecast4hAt:null},updatedAt:null,source:'pending',lastError:null,forecastError:null}));
  const byId=(id)=>document.getElementById(id);
  const nfmt=(x,d=2)=>x==null||!Number.isFinite(Number(x))?'—':Number(x).toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d});
  const nint=x=>x==null||!Number.isFinite(Number(x))?'—':nfmt(x,0);
@@ -545,7 +592,13 @@ button:disabled{cursor:not-allowed;opacity:.5}
    for(let i=0;i<p.length-1;i++)if(z>p[i].z_m&&z<p[i+1].z_m){const t=(z-p[i].z_m)/(p[i+1].z_m-p[i].z_m);return p[i].storage_mcm+t*(p[i+1].storage_mcm-p[i].storage_mcm)}
    return null;
  }
- function metrics(r){const V=storage(r,r.reading.level);return V==null?null:{V,free:Math.max(0,r.capacity_total_mcm-V),useful:Math.max(0,V-r.capacity_dead_mcm),fill:clamp(V/r.capacity_total_mcm*100,0,100),usefulPct:clamp((V-r.capacity_dead_mcm)/r.capacity_active_mcm*100,0,100)};}
+ function metrics(r){
+   // W is consistently interpolated from the same original Z-W points.
+   const V=storage(r,r.reading.level),Vdead=storage(r,r.mnc),Vnormal=storage(r,r.mndbt);
+   if(V==null||Vdead==null||Vnormal==null||Vnormal<=Vdead)return null;
+   const useful=Math.max(0,V-Vdead),free=Math.max(0,Vnormal-V);
+   return {V,Vdead,Vnormal,useful,free,fill:clamp(V/Vnormal*100,0,100),usefulPct:clamp(useful/(Vnormal-Vdead)*100,0,100)};
+ }
  function floodLevel(r){
    const d=new Date(),mm=d.getMonth()+1,dd=d.getDate();
    const md=mm*100+dd;
@@ -656,7 +709,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
    </svg>`;
  }
  function sourceLabel(o){
-   const prefix=o.id ? 'PCTT Đà Nẵng' : 'Supabase hạ du';
+   const prefix=o.id ? 'PCTT Đà Nẵng' : 'PCTT Đà Nẵng → Supabase';
    const stamp=o.updatedAt?' · '+formatObsTime(o.updatedAt):'';
    if(o.source==='live')return prefix+' · LIVE'+stamp;
    if(o.source==='stale')return (o.lastError?'MẤT KẾT NỐI · giữ số cũ':'DỮ LIỆU CŨ')+stamp;
@@ -675,9 +728,9 @@ button:disabled{cursor:not-allowed;opacity:.5}
   const lvl=r.reading.level;
   const qspill=spillNow(r);
   const metric=(title,val,unit='')=>`<div class="mini"><div class="mini-label" title="${title}">${title}</div><div class="mini-val">${val==null?'—':nfmt(val)}<span class="mini-unit">${unit}</span></div></div>`;
-  return `<article class="res-card" id="card-${r.code}"><header class="res-head"><div class="res-name"><div class="res-mark">◈</div><div><h2>${r.name}</h2><div class="res-sub">Lưu vực ${r.branch} · ${sourceLabel(r)}</div><span class="gate-pill">${statusText}${gate==null?'':' · '+nfmt(gate,0)+'%'}</span></div></div><div><div class="res-level">${nfmt(lvl)}<small> m</small></div><div class="res-delta ${d!=null&&d<0?'down':''}">${d==null?'Chưa có xu thế':(d>0?'↗ +':d<0?'↘ ':'→ ')+nfmt(d)+' m / 24h'}</div></div></header>
+  return `<article class="res-card" id="card-${r.code}"><header class="res-head"><div class="res-name"><div class="res-mark">◈</div><div><h2>${r.displayName}</h2><div class="res-sub">Lưu vực ${r.branch} · ${sourceLabel(r)}</div><span class="gate-pill">${statusText}${gate==null?'':' · '+nfmt(gate,0)+'%'}</span></div></div><div><div class="res-level">${nfmt(lvl)}<small> m</small></div><div class="res-delta ${d!=null&&d<0?'down':''}">${d==null?'Chưa có xu thế':(d>0?'↗ +':d<0?'↘ ':'→ ')+nfmt(d)+' m / 24h'}</div></div></header>
    <div class="res-visual">${reservoirSVG(r,r.code+'mini')}</div>
-   <div class="res-foot"><div class="res-metrics">${metric('Q về hồ',r.reading.inflow,'m³/s')}${metric('Q xả tràn',qspill,'m³/s')}${metric('Dung tích',m?.V,'triệu m³')}${metric('Trống → MNDBT',m?.free,'triệu m³')}</div>
+   <div class="res-foot"><div class="res-metrics">${metric('Q về hồ',r.reading.inflow,'m³/s')}${metric('Q xả tràn',qspill,'m³/s')}${metric('Hữu ích hiện tại',m?.useful,'triệu m³')}${metric('Trống → MNDBT',m?.free,'triệu m³')}</div>
    <div class="res-bottom"><div class="levels"><span class="level-key" style="--key:#ff8d9d">MNC ${nfmt(r.mnc,1)}</span><span class="level-key" style="--key:#ffcb70">Tràn ${nfmt(r.spillway_crest_m,1)}</span><span class="level-key" style="--key:#55e9c5">Đón lũ ${nfmt(fw.value,1)}</span><span class="level-key" style="--key:#76c2ff">MNDBT ${nfmt(r.mndbt,1)}</span></div><button type="button" class="detail-btn" data-detail="${r.code}" aria-label="Xem chi tiết hồ ${r.name}">Xem chi tiết ↗</button></div></div></article>`;
  }
  function gaugeSVG(g){
@@ -729,6 +782,17 @@ button:disabled{cursor:not-allowed;opacity:.5}
     <text x="12" y="333" font-size="12" fill="#b2d2e6">Cao trình mực nước (m)</text>
    </svg>`;
  }
+ function gaugeShortSource(g){
+   // Short public caption prevents the downstream card from growing taller
+   // than the reservoir cards when the browser width/zoom changes.
+   // Full data provenance remains in the header and the configuration panel.
+   const obs=g.updatedAt?formatObsTime(g.updatedAt):null;
+   if(g.source==='live')return 'PCTT Đà Nẵng'+(obs?' · '+obs:' · LIVE');
+   if(g.source==='stale')return 'DỮ LIỆU CŨ'+(obs?' · '+obs:'');
+   if(g.source==='time_error')return 'THỜI GIAN NGHI VẤN'+(obs?' · '+obs:'');
+   if(g.source==='missing')return 'PCTT Đà Nẵng · CHƯA CÓ SỐ LIỆU';
+   return 'PCTT Đà Nẵng · ĐANG KẾT NỐI';
+ }
  function gaugeCard(g){
    const v=g.reading.level,w=warning(g),gap=v==null?null:g.peak_2025_m-v,d=g.reading.delta3h;
    const fc=g.reading.forecast4h,fcAt=g.reading.forecast4hAt,fcDelta=fc!=null&&v!=null?+(fc-v).toFixed(2):null;
@@ -736,16 +800,16 @@ button:disabled{cursor:not-allowed;opacity:.5}
    let jump='Mực nước chưa cập nhật';
    if(v!=null){if(v<g.alarm_level_1)jump='Còn '+nfmt(g.alarm_level_1-v)+' m đến BĐ I';else if(v<g.alarm_level_2)jump='Trên BĐ I '+nfmt(v-g.alarm_level_1)+' m';else if(v<g.alarm_level_3)jump='Trên BĐ II '+nfmt(v-g.alarm_level_2)+' m';else jump='Trên BĐ III '+nfmt(v-g.alarm_level_3)+' m';}
    const forecastHtml=fc==null?`<div class="gauge-forecast">Dự báo +4h: chưa có dữ liệu</div>`:`<div class="gauge-forecast">Dự báo +4h: <b>${nfmt(fc)} m</b> <span class="${fcDir}">${fcDelta==null?'':(fcDelta>0?'↗ +':fcDelta<0?'↘ ':'→ ')+nfmt(fcDelta)+' m'}</span>${fcAt?`<small>Mốc dự báo: ${formatObsTime(fcAt)}</small>`:''}</div>`;
-   return `<article class="gauge-card" id="card-${g.code}"><header class="gauge-header"><div><div class="gauge-name">${g.name}</div><div class="gauge-caption">Mực nước hạ du · ${sourceLabel(g)}</div></div><span class="gauge-status" style="--scolor:${w.color};--sbg:${w.bg};--sborder:${w.border}">${w.label}</span></header>
+   return `<article class="gauge-card" id="card-${g.code}"><header class="gauge-header"><div><div class="gauge-name">${g.displayName}</div><div class="gauge-caption" title="Nguồn gốc PCTT Đà Nẵng, đồng bộ qua Supabase · ${sourceLabel(g)}">${gaugeShortSource(g)}</div></div><span class="gauge-status" style="--scolor:${w.color};--sbg:${w.bg};--sborder:${w.border}">${w.label}</span></header>
     <div class="gauge-current"><div class="gauge-big">${nfmt(v)}<small>m</small></div><div class="gauge-delta">${d==null?'Δ3h: —':d>0?'↗ +'+nfmt(d)+' m / 3 giờ':d<0?'↘ '+nfmt(d)+' m / 3 giờ':'→ Ổn định 3 giờ'}<div style="margin-top:3px;color:${w.color};font-weight:800">${jump}</div>${forecastHtml}</div></div>
     <div class="gauge-visual">${gaugeSVG(g)}</div>
     <div class="peak-block"><div><div class="peak-label">Đỉnh lũ lịch sử 2025</div><div class="peak-number">${nfmt(g.peak_2025_m)} <small style="font-size:12px">m</small></div><div class="peak-time">${g.peak_time}</div></div><div class="gap-peak">${gap==null?'Khoảng cách đến đỉnh 2025':gap>=0?'Thấp hơn đỉnh 2025':'Vượt đỉnh 2025'}<b>${gap==null?'—':nfmt(Math.abs(gap))+' m'}</b></div></div>
     <div class="gauge-alarms"><span style="--key:#ffd677">BĐ I <strong>${nfmt(g.alarm_level_1,1)}</strong></span><span style="--key:#ffaa70">BĐ II <strong>${nfmt(g.alarm_level_2,1)}</strong></span><span style="--key:#ff778d">BĐ III <strong>${nfmt(g.alarm_level_3,1)}</strong></span></div></article>`;
  }
- function summary(){let volume=0,free=0,loaded=0;for(const r of reservoirs){const m=metrics(r);if(m){volume+=m.V;free+=m.free;loaded++;}}const knownGauges=gauges.filter(g=>g.reading.level!=null).length;const freshReservoirs=reservoirs.filter(r=>r.source==='live').length;const alerts=gauges.filter(g=>warning(g).severity>=1).length;
+ function summary(){let usefulTotal=0,free=0,loaded=0;for(const r of reservoirs){const m=metrics(r);if(m){usefulTotal+=m.useful;free+=m.free;loaded++;}}const knownGauges=gauges.filter(g=>g.reading.level!=null).length;const freshReservoirs=reservoirs.filter(r=>r.source==='live').length;const alerts=gauges.filter(g=>warning(g).severity>=1).length;
    byId('overview').innerHTML=`<div class="summary"><div class="summary-icon">▥</div><div><div class="summary-title">Hệ thống hồ chứa</div><div class="summary-val">04 hồ thủy điện</div><div class="summary-note">Vu Gia – Thu Bồn · vận hành trực quan</div></div></div>
-   <div class="summary"><div class="summary-icon">◉</div><div><div class="summary-title">Dung tích theo số đo · ${loaded}/4 hồ</div><div class="summary-val">${loaded?nfmt(volume):'—'} <small style="font-size:12px">triệu m³</small></div><div class="summary-note">Tính từ Z–W của từng hồ · ${loaded}/4 có MNH</div></div></div>
-   <div class="summary"><div class="summary-icon">◌</div><div><div class="summary-title">Dung tích trống tới MNDBT · ${loaded}/4 hồ</div><div class="summary-val">${loaded?nfmt(free):'—'} <small style="font-size:12px">triệu m³</small></div><div class="summary-note">Cộng hồ có số đo gần nhất, không phải khả năng cắt lũ</div></div></div>
+   <div class="summary"><div class="summary-icon">◉</div><div><div class="summary-title">Dung tích hữu ích hiện tại · ${loaded}/4 hồ</div><div class="summary-val">${loaded?nfmt(usefulTotal):'—'} <small style="font-size:12px">triệu m³</small></div><div class="summary-note">Nội suy Z–W từ mực nước quan trắc</div></div></div>
+   <div class="summary"><div class="summary-icon">◌</div><div><div class="summary-title">Dung tích trống tới MNDBT · ${loaded}/4 hồ</div><div class="summary-val">${loaded?nfmt(free):'—'} <small style="font-size:12px">triệu m³</small></div><div class="summary-note">Tính đến MNDBT, nội suy từ quan hệ Z–W</div></div></div>
    <div class="summary"><div class="summary-icon" style="color:${alerts?'#ffe09c':'#63f0d5'}">♧</div><div><div class="summary-title">Hạ du đang theo dõi</div><div class="summary-val">${knownGauges? `02 trạm · ${alerts}/${knownGauges} cảnh báo` : "02 trạm · chưa có số liệu"}</div><div class="summary-note">Theo BĐ I / II / III của từng trạm</div></div></div>`;
  }
  // V8 grouped PCTT history: one hour per row, newest nonempty value for each cell.
@@ -825,7 +889,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
      const dt=current!=null&&fc!=null?+(fc-current).toFixed(2):null;
      const cls=dt==null?'':dt>0?'positive':dt<0?'negative':'';
      const t=g.reading.forecast4hAt;
-     return `<div class="forecast-card"><div class="forecast-card-name">${g.name}</div><div class="forecast-card-values"><div><span>Quan trắc</span><br><b>${nfmt(current)} m</b></div><div><span>Dự báo +4 giờ</span><br><b class="pred">${nfmt(fc)} m</b></div><div><span>Δ dự báo</span><br><b class="${cls}">${dt==null?'—':(dt>0?'+':'')+nfmt(dt)} m</b></div></div><div class="forecast-card-foot">${t?'Đích dự báo: '+formatObsTime(t):'Chưa có mốc dự báo hợp lệ'} · Nguồn: mô hình dự báo hạ du</div></div>`;
+     return `<div class="forecast-card"><div class="forecast-card-name">${g.displayName}</div><div class="forecast-card-values"><div><span>Quan trắc</span><br><b>${nfmt(current)} m</b></div><div><span>Dự báo +4 giờ</span><br><b class="pred">${nfmt(fc)} m</b></div><div><span>Δ dự báo</span><br><b class="${cls}">${dt==null?'—':(dt>0?'+':'')+nfmt(dt)} m</b></div></div><div class="forecast-card-foot">${t?'Đích dự báo: '+formatObsTime(t):'Chưa có mốc dự báo hợp lệ'} · Nguồn: mô hình dự báo hạ du</div></div>`;
    }).join('');
  }
  function exportHydroCsv(){
@@ -976,7 +1040,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
    el.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Hồ ${lab}, ${enabled.length} đường số liệu quan trắc, mực nước theo trục trái và lưu lượng theo trục phải">
      <rect width="${width}" height="${height}" fill="#09263c"/>
      <g>${grid}${ticks}</g>
-     <text x="${left}" y="20" fill="#edf9ff" font-size="13" font-weight="850">${lab} · ${enabled.length}/4 đường số liệu</text>
+     <text x="${left}" y="20" fill="#edf9ff" font-size="13" font-weight="850">Hồ thủy điện ${lab} · ${enabled.length}/4 đường số liệu</text>
      ${levelValues.length?`<text x="${left-4}" y="34" font-size="10" fill="#69ddff" text-anchor="start">MNH (m) · trục trái</text>`:''}
      ${flowValues.length?`<text x="${width-right+4}" y="34" font-size="10" fill="#c5cfff" text-anchor="end">Lưu lượng (m³/s) · trục phải</text>`:''}
      <g>${paths}</g>
@@ -993,14 +1057,14 @@ button:disabled{cursor:not-allowed;opacity:.5}
      const a=h.map(r=>numVal(r.plant[v91Reservoir]?.[k])).filter(v=>v!=null);
      return `<div class="v9-stat ${enabled?'':'v91-stat-hidden'}"><div class="lbl"><span style="color:${cfg.color}">● </span>${cfg.label}</div><b style="color:${cfg.color}">${a.length?nfmt(a[a.length-1]):'—'} <small>${cfg.unit}</small></b><div class="lbl">${enabled?'Hiển thị':'Đang ẩn'} · ${a.length} mốc</div></div>`;
    }).join('');
-   byId('hydroChartNote').textContent=`Hồ ${V9_RESERVOIRS[v91Reservoir]} · ${rangeHours} giờ · ${v91VisibleMetrics.size}/4 đường đang bật · MNH theo trục trái (m), ba lưu lượng theo trục phải (m³/s) · đường gián đoạn nếu thiếu trên 2 giờ · nguồn PCTT Đà Nẵng`;
+   byId('hydroChartNote').textContent=`Hồ thủy điện ${V9_RESERVOIRS[v91Reservoir]} · ${rangeHours} giờ · ${v91VisibleMetrics.size}/4 đường đang bật · MNH theo trục trái (m), ba lưu lượng theo trục phải (m³/s) · đường gián đoạn nếu thiếu trên 2 giờ · nguồn PCTT Đà Nẵng`;
    const g=gauges.find(x=>x.code===v91Station)||gauges[0];
    const col=g.code==='HOIKHACH'?'hk':'an';const pts=downHourRows().slice().reverse().map(x=>({ms:x.ms,value:numVal(x[col])})).filter(x=>x.value!=null);
    const forecast=g.reading.forecast4h==null?null:{ms:msVn(g.reading.forecast4hAt),value:g.reading.forecast4h};
    const alarm=[{label:'BĐ I',value:g.alarm_level_1,color:'#ffd287'},{label:'BĐ II',value:g.alarm_level_2,color:'#ffad73'},{label:'BĐ III',value:g.alarm_level_3,color:'#ff849c'}];
-   drawV9Series('downChart',pts,{unit:'m',color:'#65daff',title:`${g.name} · mực nước quan trắc`,forecast,thresholds:alarm,showThresholds:v91AlarmVisible});
+   drawV9Series('downChart',pts,{unit:'m',color:'#65daff',title:`${g.displayName} · mực nước quan trắc`,forecast,thresholds:alarm,showThresholds:v91AlarmVisible});
    byId('downChartThresholds').innerHTML=alarm.map(t=>`<span>${t.label}: <b style="color:${t.color}">${nfmt(t.value,2)} m</b></span>`).join('');
-   byId('downChartNote').textContent=`Trạm ${g.name}: ${pts.length} mốc · hiện tại ${nfmt(g.reading.level)} m · dự báo +4h ${nfmt(g.reading.forecast4h)} m${g.reading.forecast4hAt?' · đích '+formatObsTime(g.reading.forecast4hAt):''} · không suy diễn số liệu khi thiếu.`;
+   byId('downChartNote').textContent=`${g.displayName}: ${pts.length} mốc · hiện tại ${nfmt(g.reading.level)} m · dự báo +4h ${nfmt(g.reading.forecast4h)} m${g.reading.forecast4hAt?' · đích '+formatObsTime(g.reading.forecast4hAt):''} · không suy diễn số liệu khi thiếu.`;
  }
  // V9 – Official Google My Maps viewer embed; the underlying map is controlled by its owner.
  const V9_MYMAPS_ID='1OuvFULZypRbV6ABno2txIHFKzQ6nIhc';
@@ -1012,7 +1076,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
  }
  function updateFloodGaugePanel(){
    const root=byId('floodCurrentGauge');if(!root)return;
-   root.innerHTML=gauges.map(g=>`<div class="v9-inline-gauge"><span>${escapeHtml(g.name)}</span><b>${nfmt(g.reading.level)} m</b></div><div class="v9-side-note">Dự báo +4h: <span class="v9-forecast-pill">${nfmt(g.reading.forecast4h)} m</span> · BĐ I: ${nfmt(g.alarm_level_1,1)} m</div>`).join('');
+   root.innerHTML=gauges.map(g=>`<div class="v9-inline-gauge"><span>${escapeHtml(g.displayName)}</span><b>${nfmt(g.reading.level)} m</b></div><div class="v9-side-note">Dự báo +4h: <span class="v9-forecast-pill">${nfmt(g.reading.forecast4h)} m</span> · BĐ I: ${nfmt(g.alarm_level_1,1)} m</div>`).join('');
  }
  async function loadFloodCommunes(){
    if(v9FloodLoading)return;v9FloodLoading=true;
@@ -1092,11 +1156,11 @@ button:disabled{cursor:not-allowed;opacity:.5}
   const m=metrics(r),flood=floodLevel(r),gate=effectiveGate(r),z=r.reading.level,qspill=spillNow(r);
   const fmtMetric=(label,value,unit='')=>`<div class="detail-kpi"><div class="lb">${label}</div><b>${value==null?'—':nfmt(value)} ${unit}</b></div>`;
   const diff=(z,val)=>z==null?'—':(z>=val?'+':'−')+nfmt(Math.abs(z-val))+' m';
-  byId('detailContent').innerHTML=`<div class="detail-head"><div><h2>Mặt cắt đập ${r.name}</h2><p>Mẫu hình thống nhất · 01 van cung mô phỏng + 01 xy lanh vàng · Ngưỡng tràn ${nfmt(r.spillway_crest_m)} m</p></div><button class="btn" id="detailClose">✕ Đóng</button></div>
+  byId('detailContent').innerHTML=`<div class="detail-head"><div><h2>Mặt cắt hồ thủy điện ${r.name}</h2><p>Mẫu hình thống nhất · 01 van cung mô phỏng + 01 xy lanh vàng · Ngưỡng tràn ${nfmt(r.spillway_crest_m)} m</p></div><button class="btn" id="detailClose">✕ Đóng</button></div>
    <div class="detail-main"><div class="detail-visual">${reservoirSVG(r,r.code+'detail')}</div><div class="detail-kpis">
    ${fmtMetric('Mực nước hiện tại',z,'m')}
    <div class="detail-kpi"><div class="lb">Q về / Q qua máy / Q xả tràn</div><b style="font-size:17px">${nfmt(r.reading.inflow)} / ${nfmt(r.reading.turbine)} / ${nfmt(qspill)} <span style="font-size:12px">m³/s</span></b></div>
-   <div class="detail-kpi"><div class="lb">Dung tích / Trống đến MNDBT</div><b style="font-size:18px">${m?nfmt(m.V):'—'} / ${m?nfmt(m.free):'—'} <span style="font-size:12px">triệu m³</span></b></div>
+   <div class="detail-kpi"><div class="lb">Hữu ích hiện tại / Trống đến MNDBT</div><b style="font-size:18px">${m?nfmt(m.useful):'—'} / ${m?nfmt(m.free):'—'} <span style="font-size:12px">triệu m³</span></b></div>
    <div class="detail-kpi"><div class="lb">Chênh ngưỡng tràn / MNDBT</div><b style="font-size:17px">${diff(z,r.spillway_crest_m)} / ${diff(z,r.mndbt)}</b></div>
    <div class="detail-kpi"><div class="lb">MNC / Tràn / Đón lũ / MNDBT</div><b style="font-size:15px">${nfmt(r.mnc)} · ${nfmt(r.spillway_crest_m)} · ${nfmt(flood.value)} · ${nfmt(r.mndbt)} m</b></div>
    ${fmtMetric('Độ mở van thực (chưa kết nối)',gate,'%')}
@@ -1371,7 +1435,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
      try{await loadGaugeForecasts();}catch(e){downstreamForecastError=e.message;for(const g of gauges){g.reading.forecast4h=null;g.reading.forecast4hAt=null;g.forecastError=e.message;}}
      lastSyncTime=nowStamp();
      const all=[...reservoirs,...gauges],live=all.filter(x=>x.source==='live').length,stale=all.filter(x=>x.source==='stale').length,missing=6-live-stale;
-     setStatus(`PCTT + Supabase: ${live}/6 nguồn mới · ${stale} số đo cũ · ${missing} nguồn thiếu / chưa kiểm chứng`,live<6?'warn':'');
+     setStatus(`PCTT Đà Nẵng (hạ du qua Supabase): ${live}/6 nguồn mới · ${stale} số đo cũ · ${missing} nguồn thiếu / chưa kiểm chứng`,live<6?'warn':'');
      diagnostics();render();refreshDetailIfOpen();
    }catch(e){setStatus('Lỗi cập nhật: '+e.message,'err');}
    finally{isSyncing=false;byId('refreshLiveBtn').disabled=false;}
