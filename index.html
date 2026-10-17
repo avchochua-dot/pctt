@@ -598,12 +598,13 @@ button:disabled{cursor:not-allowed;opacity:.5}
 @media(max-width:650px){.detail-levels{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-kpi b{font-size:19px!important}.detail-level-card b{font-size:27px!important}}
 @media(max-width:430px){.detail-kpis{grid-template-columns:1fr}.detail-level-card{grid-column:auto}.detail-levels{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
+<style id="vgtb-visitor-counter-css">.vgtb-visitor-counter{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#a9d6ea;font-size:11px;font-weight:700;line-height:1.4}.vgtb-visitor-counter .vc-number{color:#64e6c7;font-variant-numeric:tabular-nums}.vgtb-visitor-counter .vc-dot{color:#49768e}.vgtb-visitor-counter[data-error="true"]{opacity:.7}@media(max-width:520px){.vgtb-visitor-counter{font-size:10px;gap:5px}}</style>
 </head>
 <body>
 <div class="screen">
   <div class="v9-shell-header" id="siteTop">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">✦</div><div><div class="kicker">AVC · GIÁM SÁT THỦY VĂN</div><h1>Trực quan liên hồ Vu Gia – Thu Bồn</h1><div class="subtitle">4 hồ · 2 trạm thủy văn · Nguồn: <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#88d9ff;text-decoration:underline;text-underline-offset:2px">PCTT Đà Nẵng</a> (hạ du qua Supabase)</div></div></div>
+      <div class="brand"><div class="brand-mark">✦</div><div><div class="kicker">AVC · GIÁM SÁT THỦY VĂN</div><h1>Trực quan liên hồ Vu Gia – Thu Bồn</h1><div class="subtitle">4 hồ · 2 trạm thủy văn · Nguồn: <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#88d9ff;text-decoration:underline;text-underline-offset:2px">PCTT Đà Nẵng</a> (hạ du qua Supabase)</div><span id="vgtbVisitCounter" class="vgtb-visitor-counter" title="Tổng lượt mở phiên Website và PWA VGTB"><span>◉ Lượt truy cập:</span><span class="vc-number" id="vgtbVisitTotal">…</span></span></div></div>
       <div class="top-actions"><span id="sourceBadge" class="mode-pill" title="Tình trạng đồng bộ nguồn">ĐANG KẾT NỐI...</span><button class="btn" id="refreshLiveBtn" type="button" title="Lấy dữ liệu quan trắc mới nhất">↻ Cập nhật</button><button class="btn" id="connectionBtn" type="button" title="Cấu hình API và Supabase">⚙ Cấu hình</button><button class="btn main-btn" id="fullscreenBtn" type="button" title="Phóng to tab hiện tại">⛶ Toàn màn hình</button></div>
     </header>
     <nav class="site-nav" aria-label="Điều hướng website AVC">
@@ -1872,6 +1873,40 @@ button:disabled{cursor:not-allowed;opacity:.5}
  render();diagnostics();refreshLive();
  setInterval(()=>{if(!document.hidden)refreshLive();},LIVE_CONFIG.refreshMs);
 
+})();
+</script>
+<script id="vgtb-visitor-counter-js">
+(function(){
+'use strict';
+// Dung chung 1 bo dem VGTB cho website va PWA. Khong dem khi doi tab hay refresh.
+const BASE='https://ycthhachfxczwkburnfa.supabase.co';
+const KEY='sb_publishable_Q0KbTLPBE4owO72Mz-GN6A_khF9z_Ss';
+const SESSION_KEY='vgtb_visit_counted_v1';
+const fmt=n=>Number(n).toLocaleString('vi-VN');
+const target=document.getElementById('vgtbVisitTotal');
+if(!target)return;
+const headers={'apikey':KEY,'Content-Type':'application/json','Accept':'application/json'};
+async function readTotal(){
+ const res=await fetch(BASE+'/rest/v1/site_stats?id=eq.vgtb&select=total_visits',{headers:{apikey:KEY,Accept:'application/json'},cache:'no-store'});
+ if(!res.ok)throw new Error('site_stats HTTP '+res.status);
+ const rows=await res.json();return Number(rows?.[0]?.total_visits ?? 0);
+}
+async function countOnce(){
+ // Session storage la theo tab. Ghi session marker sau khi RPC thanh cong.
+ let counted=false;try{counted=sessionStorage.getItem(SESSION_KEY)==='1';}catch(_){}
+ if(!counted){
+  const res=await fetch(BASE+'/rest/v1/rpc/increment_vgtb_visit',{method:'POST',headers,body:'{}',cache:'no-store'});
+  if(!res.ok)throw new Error('increment_vgtb_visit HTTP '+res.status);
+  const total=await res.json();
+  try{sessionStorage.setItem(SESSION_KEY,'1');}catch(_){}
+  return Number(total);
+ }
+ return readTotal();
+}
+countOnce().then(n=>{target.textContent=Number.isFinite(n)?fmt(n):'—';}).catch(err=>{
+ console.warn('[VGTB visit counter]',err);target.textContent='—';
+ document.getElementById('vgtbVisitCounter')?.setAttribute('data-error','true');
+});
 })();
 </script>
 </body>
