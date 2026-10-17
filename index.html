@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="theme-color" content="#071b2d" />
-<title>AVC HYDRO MONITOR V9.2.4 PUBLIC | Trực quan liên hồ Vu Gia – Thu Bồn</title>
+<title>AVC HYDRO MONITOR V9.4 | Sơ đồ lưu vực Vu Gia – Thu Bồn</title>
 <style>
 :root{
   color-scheme:dark;
@@ -435,6 +435,169 @@ button:disabled{cursor:not-allowed;opacity:.5}
 /* Fullscreen has its own fluid layout: do not constrain river staff there. */
 .board:fullscreen .gauge-visual{flex:1 1 0%!important;height:auto!important;min-height:0!important;max-height:none!important;}
 </style>
+<style id="v93-basin-svg-map">
+/* V9.3: New independent basin-map tab. No changes to Overview cards or dam SVG. */
+.basin-workspace{max-width:100%;padding-top:7px}
+.basin-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px 20px;margin:7px 2px 12px}
+.basin-eyebrow{font-size:10px;letter-spacing:.11em;font-weight:900;color:#6adaed;margin-bottom:4px}
+.basin-top h2{font-size:clamp(18px,1.65vw,26px);line-height:1.18;margin:0 0 6px;color:#f2fbff}
+.basin-top p{font-size:11px;line-height:1.5;margin:0;color:#a5c9dd;max-width:800px}
+.basin-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.basin-action{border:1px solid #426a82;border-radius:9px;padding:8px 11px;color:#d6efff;background:linear-gradient(180deg,#194361,#10324d);font-weight:800;font-size:11px;white-space:nowrap}
+.basin-action:hover{background:#21597c;border-color:#7acfee}
+.basin-action[aria-pressed=true]{background:#165360;border-color:#67ddd2;color:#cafff4}
+.basin-map-viewport{position:relative;overflow-x:auto;overflow-y:hidden;border:1px solid #3b6782;border-radius:18px;background:#0a243a;box-shadow:0 15px 38px #00162570;overscroll-behavior-x:contain;scrollbar-color:#547992 #0a243a}
+.basin-map-stage{width:100%;min-width:1160px;aspect-ratio:1550 / 810;position:relative;isolation:isolate;overflow:hidden;background:#092338}
+.basin-map-stage>svg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.basin-bg-label{font-size:25px;letter-spacing:.14em;font-weight:950;fill:#b1e6e4;opacity:.50;paint-order:stroke;stroke:#102f43;stroke-width:7px;stroke-linejoin:round}
+.basin-svg-river-title{fill:#c0f3ff;font-size:19px;font-weight:900;paint-order:stroke;stroke:#0a3149;stroke-width:6px;stroke-linejoin:round}
+.basin-svg-landscape-label{fill:#a4cad9;font-size:14px;font-weight:800;letter-spacing:.04em;paint-order:stroke;stroke:#092637;stroke-width:5px;stroke-linejoin:round}
+.basin-water-halo{stroke:#1abcf0;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;opacity:.12;filter:url(#bGlow)}
+.basin-water-river{stroke:#13719f;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.basin-water-core{stroke:url(#bRiver);stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+.basin-water-small{stroke:#1682b0;stroke-width:12;stroke-linecap:round;stroke-linejoin:round;opacity:.93}
+.basin-water-small-core{stroke:#56c5ed;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.basin-water-motion{fill:none;stroke:#c5faff;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:3 45;opacity:.62;animation:basin-river-run 4.5s linear infinite}
+@keyframes basin-river-run{to{stroke-dashoffset:-192}}
+.basin-transfer{stroke:#efbd74;stroke-width:4;stroke-dasharray:8 10;stroke-linecap:round;opacity:.90;fill:none}
+.basin-transfer-arrow{stroke:#f8d394;stroke-width:2;opacity:.86;fill:none;stroke-dasharray:3 8}
+.basin-map-viewport.basin-still .basin-water-motion{animation:none;opacity:.24}
+.basin-map-viewport.basin-still .basin-station-pin{animation:none}
+.basin-map-viewport.basin-hide-cards .basin-node{display:none}
+.basin-map-viewport.basin-hide-cards .basin-map-badge{display:block}
+.basin-node{--bnode:#60d9fb;display:flex;flex-direction:column;gap:4px;position:absolute;z-index:5;width:clamp(210px,17.7%,275px);min-height:0;text-align:left;color:#f0fbff;border:1px solid color-mix(in srgb,var(--bnode) 65%,#32566c);border-left:4px solid var(--bnode);border-radius:14px;background:linear-gradient(155deg,#143d55f2,#092638f5);box-shadow:0 10px 25px #00172570, inset 0 1px 0 #ffffff11;padding:9px 11px 8px;backdrop-filter:blur(4px);font:inherit;cursor:pointer;transition:transform .13s ease,border-color .13s ease,box-shadow .13s ease}
+.basin-node:hover,.basin-node:focus-visible{transform:translateY(-3px);border-color:#d0f7ff;box-shadow:0 9px 28px #001b2bcc,0 0 0 2px #ffffff14}
+.basin-node-header{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.basin-node-title{font-size:clamp(11px,.92vw,14px);font-weight:920;line-height:1.16;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.basin-node-tag{display:inline-block;flex:0 0 auto;padding:3px 5px;border-radius:5px;background:#145948;border:1px solid #2c977a;color:#b2f9e0;font-size:8px;font-weight:920;letter-spacing:.02em}
+.basin-node-tag.is-stale{background:#54421d;border-color:#b3893a;color:#ffe5a1}
+.basin-node-tag.is-missing{background:#243e51;border-color:#54758d;color:#cadce8}
+.basin-node-reading{display:flex;align-items:baseline;gap:6px;margin:0;min-width:0}
+.basin-node-reading>small{font-size:10px;font-weight:800;color:#9fbfd4}
+.basin-node-reading>b{font-size:clamp(19px,1.5vw,24px);font-weight:950;letter-spacing:-.035em;color:var(--bnode);font-variant-numeric:tabular-nums}
+.basin-node-reading>em{font-size:10px;color:#cee9f8;font-style:normal;font-weight:800}
+.basin-node-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;padding:4px 0;border-top:1px solid #52728555;border-bottom:1px solid #52728555}
+.basin-node-flow span{font-size:9px;color:#9ec7db;display:flex;flex-direction:column;gap:2px;white-space:nowrap;overflow:hidden;min-width:0}
+.basin-node-flow b{font-size:12px;color:#edfaff;font-weight:920;font-variant-numeric:tabular-nums}
+.basin-node-flow span:nth-child(2) b{color:#68f1c4}
+.basin-node-flow span:nth-child(3) b{color:#ffd389}
+.basin-node-time{font-size:9px;color:#a7c5d7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.basin-node-gauge{width:clamp(206px,15.5%,240px);--bnode:#67ebcd}
+.basin-node-gauge .basin-node-title{font-size:12px}
+.basin-node-gauge .basin-node-reading{margin-top:2px}
+.basin-node-forecast{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#a8cfdf}
+.basin-node-forecast b{color:#e3c7ff;font-size:13px;font-weight:920}
+.basin-node-gauge .basin-node-time{padding-top:4px;border-top:1px solid #52728555}
+.basin-bung{left:4.5%;top:10.1%;--bnode:#5de9ab}
+.basin-avuong{left:34.5%;top:7.8%;--bnode:#60cbff}
+.basin-dakmi{left:4.5%;top:43%;--bnode:#c0a0ff}
+.basin-songtranh{left:4.5%;top:76.0%;--bnode:#ffbd70}
+.basin-hoikhach{left:68.4%;top:29.8%;--bnode:#67ebcd}
+.basin-ainghia{left:80.8%;top:56.8%;--bnode:#67ebcd}
+.basin-map-badge{display:none;position:absolute;z-index:5;color:#fff;background:#103a52e9;border:1px solid #3d7c9a;border-radius:8px;padding:6px 9px;font-size:10px;font-weight:850}
+.basin-map-key{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;font-size:10px;color:#aac9d8;padding:11px 2px 3px}
+.basin-map-key span{display:inline-flex;align-items:center;gap:5px}
+.basin-map-key i{display:inline-block;width:23px;height:4px;border-radius:3px;background:var(--swatch)}
+.basin-map-key i.basin-dash{background:none;border-top:3px dashed #f4bb69;height:0}
+.basin-info-line{padding:6px 2px;color:#a0c4d9;font-size:10px;line-height:1.5}
+.basin-station-pin{animation:basin-pin-pulse 3s ease-in-out infinite}
+@keyframes basin-pin-pulse{50%{opacity:.5;r:14}}
+.basin-dlg{color:#e7f6ff;border:1px solid #44718d;border-radius:18px;background:linear-gradient(150deg,#103752,#09273c);padding:24px;max-width:min(460px,calc(100vw - 32px));box-shadow:0 25px 70px #0009}
+.basin-dlg::backdrop{background:#001828a8;backdrop-filter:blur(3px)}
+.basin-dlg-head{display:flex;gap:14px;justify-content:space-between;align-items:flex-start}.basin-dlg h3{font-size:21px;margin:0 0 6px}.basin-dlg-sub{font-size:11px;color:#a3c5d9;line-height:1.6}
+.basin-dlg-value{font-size:32px;font-weight:950;margin:15px 0 10px;color:#78f2e1}.basin-dlg-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px}.basin-dlg-rows>div{background:#123a55;border:1px solid #335d75;border-radius:11px;padding:10px;font-size:10px;color:#b6d1e2}.basin-dlg-rows b{display:block;color:#ecfbff;font-size:15px;margin-top:5px}.basin-dlg-warning{color:#ffd49b;font-size:11px;margin-top:13px;line-height:1.6}
+.basin-map-viewport:fullscreen{border:0;border-radius:0;overflow:auto;background:#071b2d}
+.basin-map-viewport:fullscreen .basin-map-stage{width:max(100%,1350px);height:auto;min-width:1160px}
+.basin-exit{display:none;position:absolute;z-index:20;right:15px;top:12px;background:#0a324c;border:1px solid #63a1bf;color:#dff5ff;border-radius:9px;padding:8px 11px;font-size:11px;font-weight:850}
+.basin-map-viewport:fullscreen .basin-exit{display:block}
+@media(prefers-reduced-motion:reduce){.basin-water-motion,.basin-station-pin{animation:none!important}.basin-node{transition:none}}
+@media(max-width:760px){.basin-top{padding:2px 0}.basin-actions{justify-content:flex-start}.basin-map-key{font-size:9px}.basin-map-stage{min-width:1160px}.basin-node-title{font-size:12px}}
+</style>
+
+<style id="v94-basin-topology-only">
+/* V9.4: basin-only styles. No selectors target existing reservoir cards or overview grids. */
+#view-basin .basin-map-stage{aspect-ratio:1800/1000;min-width:1180px;background:#08283b}
+#view-basin .basin-map-stage>svg{pointer-events:auto}
+#view-basin .basin-top{margin:8px 0;align-items:center}
+#view-basin .basin-top h2{font-size:20px;margin:0 0 4px}
+#view-basin .basin-top p{max-width:900px;font-size:11px}
+#view-basin .basin-eyebrow{font-size:9px}
+#view-basin .b94-river-outline{stroke:#086e9c;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+#view-basin .b94-river-core{stroke:url(#b94River);stroke-linecap:round;stroke-linejoin:round}
+#view-basin .basin-water-motion{stroke:#ddfbff;stroke-width:1.8;stroke-dasharray:3 43;opacity:.63}
+#view-basin .b94-river-label{fill:#c6f5ff;font-size:18px;font-weight:850;paint-order:stroke;stroke:#174451;stroke-width:5px;stroke-linejoin:round}
+#view-basin .b94-basin-title{fill:#bbd7c2;font-size:25px;letter-spacing:3px;font-weight:900;opacity:.5}
+#view-basin .b94-plant-label{fill:#ebf8ff;font-size:17px;font-weight:820;paint-order:stroke;stroke:#19413f;stroke-width:4px;stroke-linejoin:round}
+#view-basin .b94-station-label{fill:#fff0e8;font-size:17px;font-weight:900;paint-order:stroke;stroke:#153c4a;stroke-width:5px;stroke-linejoin:round}
+#view-basin .b94-place-label{fill:#ffdfa1;font-size:16px;font-weight:850;paint-order:stroke;stroke:#234842;stroke-width:4px}
+#view-basin .b94-small-label{fill:#bad4df;font-size:12px;font-weight:700;paint-order:stroke;stroke:#1e4347;stroke-width:3px;stroke-linejoin:round}
+#view-basin .b94-connector-label{fill:#bdfaff;font-size:16px;font-weight:850;paint-order:stroke;stroke:#123948;stroke-width:4px}
+#view-basin .b94-connector-sub{fill:#96c8d4;font-size:12px;font-weight:700}
+#view-basin .b94-key-title{fill:#deeffb;font-size:14px;font-weight:850;letter-spacing:1px}
+#view-basin .b94-key-text{fill:#b4d5e1;font-size:12px;font-weight:650}
+#view-basin .b94-transfer{fill:none;stroke:#f6c47e;stroke-width:2.3;stroke-dasharray:7 8;opacity:.7}
+#view-basin .b94-transfer-label{fill:#e5c395;font-size:12px;font-weight:650;paint-order:stroke;stroke:#16404c;stroke-width:3px}
+#view-basin .b94-junction{fill:#d4faff;stroke:#12617b;stroke-width:1.5}
+#view-basin .b94-station[role=button],#view-basin .b94-dam[role=button]{cursor:pointer;outline:none}
+#view-basin .b94-station:focus-visible circle:last-child,#view-basin .b94-station:hover circle:last-child{stroke:#fff;stroke-width:4}
+#view-basin .b94-dam:hover,#view-basin .b94-dam:focus-visible{filter:drop-shadow(0 0 4px #9cffff)}
+#view-basin .b94-card-wrap{height:100%;padding:2px;box-sizing:border-box}
+#view-basin .b94-card-fo .basin-node{position:static;width:100%;height:100%;padding:10px 12px 8px;min-height:0;gap:5px;border-radius:13px;border-left-width:3px;background:linear-gradient(145deg,#143d52,#092638);box-shadow:none;backdrop-filter:none;transform:none}
+#view-basin .b94-card-fo .basin-node:hover,#view-basin .b94-card-fo .basin-node:focus-visible{transform:none;background:linear-gradient(145deg,#1d5065,#0d2d43);box-shadow:inset 0 0 0 1px #90d9e7}
+#view-basin .b94-card-fo .basin-node-title{font-size:16px;line-height:1.2;letter-spacing:-.15px;font-weight:850}
+#view-basin .b94-card-fo .basin-node-tag{font-size:8.5px;padding:3px 4px;border-radius:5px}
+#view-basin .b94-card-fo .basin-node-reading{gap:6px;line-height:1.1;margin:1px 0}
+#view-basin .b94-card-fo .basin-node-reading b{font-size:27px;line-height:1.1}
+#view-basin .b94-card-fo .basin-node-reading small,#view-basin .b94-card-fo .basin-node-reading em{font-size:10px}
+#view-basin .b94-card-fo .basin-node-flow{position:relative;grid-template-columns:repeat(3,1fr);gap:3px;padding:4px 22px 4px 0;width:100%}
+#view-basin .b94-card-fo .basin-node-flow span{font-size:9px;gap:2px}
+#view-basin .b94-card-fo .basin-node-flow b{font-size:13px;line-height:1.1}
+#view-basin .b94-card-fo .basin-node-flow em{position:absolute;right:0;bottom:6px;color:#8bb8cc;font-size:8px;font-style:normal}
+#view-basin .b94-card-fo .basin-node-time{font-size:9px;line-height:1.3;width:100%;margin-top:auto}
+#view-basin .b94-card-fo .basin-node-forecast{font-size:11px;gap:5px;line-height:1.3}
+#view-basin .b94-card-fo .basin-node-forecast b{font-size:15px}
+#view-basin .b94-cardless{display:none}
+#view-basin .basin-hide-cards .b94-card-fo,#view-basin .basin-hide-cards .b94-card-leaders{display:none}
+#view-basin .basin-hide-cards .b94-cardless{display:block}
+#view-basin .basin-map-viewport:fullscreen{display:flex;align-items:center;justify-content:center;overflow:auto;padding:38px 6px 6px}
+#view-basin .basin-map-viewport:fullscreen .basin-map-stage{flex:none;width:min(calc(100vw - 12px),calc((100dvh - 44px)*1.8));min-width:0;height:auto;aspect-ratio:1800/1000}
+#view-basin .basin-map-key{font-size:10px;padding-top:8px}
+#view-basin .basin-info-line{font-size:10px;padding-top:2px}
+@media(max-width:760px){#view-basin .basin-map-stage{min-width:1180px}#view-basin .basin-map-viewport:fullscreen{display:block}#view-basin .basin-map-viewport:fullscreen .basin-map-stage{width:1180px;min-width:1180px}#view-basin .basin-top h2{font-size:17px}}
+</style>
+
+<style id="v9-5-detail-popup-kpi">
+/* V9.5 - Popup chi tiết: tách từng thông số, màu nhận diện riêng */
+.detail-main{grid-template-columns:minmax(0,2.35fr) minmax(360px,.95fr);gap:16px;align-items:start}
+.detail-left{min-width:0}
+.detail-kpis{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important;align-content:start}
+.detail-kpi{min-width:0;padding:12px 13px!important;border-radius:13px;background:#102f45;border:1px solid #315d75;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.detail-kpi .lb{font-size:11px!important;line-height:1.25;color:#a9c9db}
+.detail-kpi b{font-size:21px!important;line-height:1.12;margin-top:5px!important;white-space:nowrap}
+.detail-kpi .unit{font-size:11px;font-weight:800;opacity:.88;margin-left:3px}
+.detail-level-card{grid-column:1/-1;padding:14px 15px!important;background:linear-gradient(135deg,rgba(14,91,119,.76),rgba(12,49,71,.92));border-color:#38b9dc}
+.detail-level-card b{font-size:30px!important;color:#dffbff}
+.detail-kpi.tone-inflow{background:linear-gradient(135deg,rgba(16,73,104,.88),rgba(10,43,64,.96));border-color:#2f83ad}.detail-kpi.tone-inflow b{color:#70d6ff}
+.detail-kpi.tone-turbine{background:linear-gradient(135deg,rgba(10,79,72,.75),rgba(9,50,50,.95));border-color:#2c8d83}.detail-kpi.tone-turbine b{color:#64f0d1}
+.detail-kpi.tone-spill{background:linear-gradient(135deg,rgba(102,63,10,.72),rgba(60,39,8,.94));border-color:#ae7421}.detail-kpi.tone-spill b{color:#ffc65b}
+.detail-kpi.tone-useful{background:linear-gradient(135deg,rgba(9,81,78,.75),rgba(9,47,51,.94));border-color:#298c89}.detail-kpi.tone-useful b{color:#5af6da}
+.detail-kpi.tone-free{background:linear-gradient(135deg,rgba(53,55,111,.78),rgba(29,33,73,.95));border-color:#626bc6}.detail-kpi.tone-free b{color:#adb4ff}
+.detail-kpi.tone-crest{background:linear-gradient(135deg,rgba(105,70,14,.70),rgba(58,41,12,.95));border-color:#b07a26}.detail-kpi.tone-crest b{color:#ffd06a}
+.detail-kpi.tone-normal{background:linear-gradient(135deg,rgba(26,71,117,.77),rgba(18,43,75,.95));border-color:#477fb9}.detail-kpi.tone-normal b{color:#77bfff}
+.detail-kpi.tone-gate{background:linear-gradient(135deg,rgba(55,72,84,.72),rgba(33,47,59,.96));border-color:#586f80}.detail-kpi.tone-gate b{color:#d8e5ec}
+.detail-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:10px}
+.detail-ref-card{min-width:0;border-radius:11px;padding:9px 10px;background:#0d2b40;border:1px solid #2e5369}
+.detail-ref-card .lb{display:block;font-size:10px;line-height:1.2;color:#a9c8d8;margin-bottom:4px}
+.detail-ref-card b{display:block;font-size:17px;line-height:1.15;white-space:nowrap}
+.detail-ref-card.mnc{border-color:#b95062;background:rgba(98,34,47,.45)}.detail-ref-card.mnc b{color:#ff8195}
+.detail-ref-card.spill{border-color:#b07a26;background:rgba(94,61,11,.46)}.detail-ref-card.spill b{color:#ffd06a}
+.detail-ref-card.flood{border-color:#218e7c;background:rgba(8,75,66,.45)}.detail-ref-card.flood b{color:#5af2d0}
+.detail-ref-card.mndbt{border-color:#3b87b9;background:rgba(16,63,94,.48)}.detail-ref-card.mndbt b{color:#73c9ff}
+.detail-data-note{font-size:10px;color:#8fb3c7;margin-top:4px;line-height:1.25}
+@media(max-width:1080px){.detail-main{grid-template-columns:1fr}.detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-levels{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:650px){.detail-levels{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-kpi b{font-size:19px!important}.detail-level-card b{font-size:27px!important}}
+@media(max-width:430px){.detail-kpis{grid-template-columns:1fr}.detail-level-card{grid-column:auto}.detail-levels{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 </head>
 <body>
 <div class="screen">
@@ -448,6 +611,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
         <button class="site-tab" type="button" role="tab" id="tabOverview" aria-controls="view-overview" aria-selected="true" data-view="overview">▦ Tổng quan</button>
         <button class="site-tab" type="button" role="tab" id="tabData" aria-controls="view-data" aria-selected="false" data-view="data">▤ Số liệu</button>
         <button class="site-tab" type="button" role="tab" id="tabCharts" aria-controls="view-charts" aria-selected="false" data-view="charts">▥ Biểu đồ</button>
+        <button class="site-tab" type="button" role="tab" id="tabBasin" aria-controls="view-basin" aria-selected="false" data-view="basin">◈ Sơ đồ lưu vực</button>
         <button class="site-tab" type="button" role="tab" id="tabFlood" aria-controls="view-flood" aria-selected="false" data-view="flood">⌖ Mốc lũ hạ du</button>
         <button class="site-tab" type="button" role="tab" id="tabWeather" aria-controls="view-weather" aria-selected="false" data-view="weather">☁ Thời tiết Windy</button>
       </div>
@@ -553,6 +717,58 @@ button:disabled{cursor:not-allowed;opacity:.5}
       <div class="v9-chart-wrap" id="downChart" role="img" aria-label="Biểu đồ trạm hạ du có dự báo bốn giờ"><div class="v9-empty">Đang nạp quan trắc hạ du…</div></div><div class="v9-chart-thresholds" id="downChartThresholds"></div><div class="v9-chart-caption" id="downChartNote"></div>
     </section>
   </section>
+<section class="site-view basin-workspace" id="view-basin" role="tabpanel" aria-labelledby="tabBasin" hidden>
+ <div class="basin-top">
+   <div><div class="basin-eyebrow">AVC · HỆ THỐNG LIÊN HỒ</div><h2>Sơ đồ lưu vực Vu Gia – Thu Bồn <span style="color:#62e7c3;font-size:11px;vertical-align:middle">● Số liệu quan trắc</span></h2><p>Sơ đồ nguyên lý theo hình tham chiếu. Bấm vào hồ hoặc chấm trạm để xem chi tiết; thẻ số liệu không thay thế vị trí điểm trên sông.</p></div>
+   <div class="basin-actions"><button class="basin-action" id="basinMotionBtn" type="button" aria-pressed="true">◉ Dòng chảy minh họa: Bật</button><button class="basin-action" id="basinCardsBtn" type="button" aria-pressed="true">▣ Thẻ số liệu: Hiện</button><button class="basin-action" id="basinFullscreenBtn" type="button">⛶ Toàn màn hình</button></div>
+ </div>
+ <div class="basin-map-viewport" id="basinMapFrame" tabindex="0" aria-label="Sơ đồ lưu vực có thể cuộn ngang trên thiết bị nhỏ">
+       <div class="basin-map-stage" id="basinMapStage">
+<svg id="basinNetworkSVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="b94MapTitle b94MapDesc">
+<title id="b94MapTitle">Sơ đồ thủy điện Vu Gia – Thu Bồn</title>
+<desc id="b94MapDesc">Hội Khách nằm sau hợp lưu Bung và Cái, trước cửa nhập sông Côn. Nhánh nối tách từ Vu Gia ở thượng lưu Ái Nghĩa và nhập Thu Bồn tại Giao Thủy. Sơ đồ nguyên lý, không theo tỷ lệ.</desc>
+<defs>
+ <radialGradient id="b94Bg" cx="30%" cy="10%" r="110%"><stop stop-color="#204964"/><stop offset=".55" stop-color="#0a2b43"/><stop offset="1" stop-color="#061d30"/></radialGradient>
+ <linearGradient id="b94Vu" x2=".95" y2="1"><stop stop-color="#73835a" stop-opacity=".61"/><stop offset="1" stop-color="#224e51" stop-opacity=".62"/></linearGradient>
+ <linearGradient id="b94Thu" x2=".9" y2="1"><stop stop-color="#347764" stop-opacity=".76"/><stop offset="1" stop-color="#144552" stop-opacity=".84"/></linearGradient>
+ <linearGradient id="b94River" x2="0" y2="1"><stop stop-color="#95f3ff"/><stop offset="1" stop-color="#25b7ed"/></linearGradient>
+ <linearGradient id="b94Concrete" x2="1" y2="1"><stop stop-color="#e4eff1"/><stop offset=".5" stop-color="#98b4bd"/><stop offset="1" stop-color="#557785"/></linearGradient>
+ <pattern id="b94Grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#7ab9ce" opacity=".045"/></pattern>
+ <pattern id="b94Topo" width="130" height="70" patternUnits="userSpaceOnUse"><path d="M-10 28Q34 2 77 22T148 22M-8 47Q34 20 82 42T153 40" fill="none" stroke="#c4e3c0" opacity=".055" stroke-width="1.6"/></pattern>
+ <marker id="b94Arrow" markerWidth="9" markerHeight="9" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L7 4 0 8" fill="none" stroke="#e4fbff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+ <symbol id="b94Dam" viewBox="0 0 44 40"><path d="M2 33Q9 26 19 31T42 33L40 40H2Z" fill="#2bbded" opacity=".78"/><path d="M8 4H34L40 35H4Z" fill="url(#b94Concrete)" stroke="#d8f0f7" stroke-width="1.2"/><path d="M7 3H36V8H7Z" fill="#d7e5e4" stroke="#5a7a85"/><path d="M12 9H16L13 35H8ZM21 9H25L26 35H20ZM30 9H33L39 35H33Z" fill="#365c6b"/><path d="M13 11H15L12 35H9ZM22 11H24L25 35H21ZM31 11H32L37 35H34Z" fill="#68dbfa"/></symbol>
+ <symbol id="b94Pine" viewBox="0 0 26 46"><path d="M12 31V45" stroke="#8b9d79" stroke-width="2"/><path d="M13 0L25 24H20L26 36H0L7 24H2Z" fill="#31675e"/><path d="M13 0V36H0L7 24H2Z" fill="#78a68a" opacity=".18"/></symbol>
+</defs>
+<rect width="1800" height="1000" fill="url(#b94Bg)"/><rect width="1800" height="1000" fill="url(#b94Grid)"/>
+<path d="M30 78C150 8 347 17 466 74C652 6 804 52 960 64C1174 12 1393 100 1500 181C1602 281 1561 485 1586 570L1541 711C1367 711 1242 631 1104 684C917 713 797 658 648 688C419 670 204 687 68 590C10 490 0 234 30 78Z" fill="url(#b94Vu)" stroke="#9eb680" stroke-opacity=".55" stroke-width="2.5"/><path d="M30 78C150 8 347 17 466 74C652 6 804 52 960 64C1174 12 1393 100 1500 181C1602 281 1561 485 1586 570L1541 711C1367 711 1242 631 1104 684C917 713 797 658 648 688C419 670 204 687 68 590C10 490 0 234 30 78Z" fill="url(#b94Topo)"/><path d="M25 721C172 666 357 688 482 711C687 668 850 722 1005 709C1161 676 1375 729 1475 786C1587 776 1713 806 1777 854L1760 961C1572 995 1396 953 1280 980C1100 1008 949 957 784 980C538 1017 353 956 201 979C127 978 70 950 28 915Z" fill="url(#b94Thu)" stroke="#77bfa6" stroke-opacity=".60" stroke-width="2.5"/><path d="M25 721C172 666 357 688 482 711C687 668 850 722 1005 709C1161 676 1375 729 1475 786C1587 776 1713 806 1777 854L1760 961C1572 995 1396 953 1280 980C1100 1008 949 957 784 980C538 1017 353 956 201 979C127 978 70 950 28 915Z" fill="url(#b94Topo)"/><g opacity=".4" fill="#315f56" stroke="#9bbe8e" stroke-opacity=".23"><path transform="translate(425 220) scale(1)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/><path transform="translate(820 150) scale(0.75)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/><path transform="translate(735 311) scale(0.8)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/><path transform="translate(1170 150) scale(1.25)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/><path transform="translate(510 815) scale(0.7)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/><path transform="translate(1180 906) scale(1.1)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/><path transform="translate(1485 880) scale(0.85)" d="M-42 48L-8 -22 21 21 39 -7 81 65Z"/></g><g opacity=".37"><use href="#b94Pine" x="63" y="402" width="20.8" height="36.800000000000004"/><use href="#b94Pine" x="520" y="208" width="18.2" height="32.199999999999996"/><use href="#b94Pine" x="798" y="208" width="15.6" height="27.599999999999998"/><use href="#b94Pine" x="865" y="192" width="20.8" height="36.800000000000004"/><use href="#b94Pine" x="1227" y="175" width="23.400000000000002" height="41.4"/><use href="#b94Pine" x="1303" y="311" width="16.900000000000002" height="29.900000000000002"/><use href="#b94Pine" x="679" y="957" width="16.900000000000002" height="29.900000000000002"/><use href="#b94Pine" x="359" y="930" width="20.8" height="36.800000000000004"/><use href="#b94Pine" x="974" y="934" width="23.400000000000002" height="41.4"/><use href="#b94Pine" x="1674" y="884" width="22.099999999999998" height="39.1"/></g><text x="1050" y="94" class="b94-basin-title" >LƯU VỰC SÔNG VU GIA</text><text x="845" y="949" class="b94-basin-title" >LƯU VỰC SÔNG THU BỒN</text><g fill="none" class="b94-rivers"><g data-edge="bung2_4" data-from="SB2" data-to="SB4"><path class="b94-river-outline" d="M145 134 C267 154 363 216 365 321" stroke-width="23"/><path id="b94-edge-bung2_4" class="b94-river-core" d="M145 134 C267 154 363 216 365 321" stroke-width="15"/><path class="basin-water-motion" d="M145 134 C267 154 363 216 365 321"/></g><g data-edge="bung4_join" data-from="SB4" data-to="JOIN_AV_BUNG"><path class="b94-river-outline" d="M365 321 C410 347 480 370 550 380" stroke-width="23"/><path id="b94-edge-bung4_join" class="b94-river-core" d="M365 321 C410 347 480 370 550 380" stroke-width="15"/><path class="basin-water-motion" d="M365 321 C410 347 480 370 550 380"/></g><g data-edge="av_join" data-from="AVUONG" data-to="JOIN_AV_BUNG"><path class="b94-river-outline" d="M663 229 C689 280 604 310 550 380" stroke-width="18"/><path id="b94-edge-av_join" class="b94-river-core" d="M663 229 C689 280 604 310 550 380" stroke-width="10"/><path class="basin-water-motion" d="M663 229 C689 280 604 310 550 380"/></g><g data-edge="bung_4a" data-from="JOIN_AV_BUNG" data-to="SB4A"><path class="b94-river-outline" d="M550 380 C572 386 594 393 610 402" stroke-width="23"/><path id="b94-edge-bung_4a" class="b94-river-core" d="M550 380 C572 386 594 393 610 402" stroke-width="15"/><path class="basin-water-motion" d="M550 380 C572 386 594 393 610 402"/></g><g data-edge="bung_5" data-from="SB4A" data-to="SB5"><path class="b94-river-outline" d="M610 402 C640 415 662 428 687 444" stroke-width="23"/><path id="b94-edge-bung_5" class="b94-river-core" d="M610 402 C640 415 662 428 687 444" stroke-width="15"/><path class="basin-water-motion" d="M610 402 C640 415 662 428 687 444"/></g><g data-edge="bung_6" data-from="SB5" data-to="SB6"><path class="b94-river-outline" d="M687 444 C716 462 740 475 764 483" stroke-width="23"/><path id="b94-edge-bung_6" class="b94-river-core" d="M687 444 C716 462 740 475 764 483" stroke-width="15"/><path class="basin-water-motion" d="M687 444 C716 462 740 475 764 483"/></g><g data-edge="bung_cai" data-from="SB6" data-to="JOIN_BUNG_CAI"><path class="b94-river-outline" d="M764 483 C789 497 811 507 835 510" stroke-width="23"/><path id="b94-edge-bung_cai" class="b94-river-core" d="M764 483 C789 497 811 507 835 510" stroke-width="15"/><path class="basin-water-motion" d="M764 483 C789 497 811 507 835 510"/></g><g data-edge="dakmi" data-from="DAKMI4" data-to="JOIN_DAKMI_THANH"><path class="b94-river-outline" d="M310 607 C388 614 423 632 508 630" stroke-width="18"/><path id="b94-edge-dakmi" class="b94-river-core" d="M310 607 C388 614 423 632 508 630" stroke-width="10"/><path class="basin-water-motion" d="M310 607 C388 614 423 632 508 630"/></g><g data-edge="thanh" data-from="THANH_SOURCE" data-to="JOIN_DAKMI_THANH"><path class="b94-river-outline" d="M340 390 C401 441 411 555 508 630" stroke-width="18"/><path id="b94-edge-thanh" class="b94-river-core" d="M340 390 C401 441 411 555 508 630" stroke-width="10"/><path class="basin-water-motion" d="M340 390 C401 441 411 555 508 630"/></g><g data-edge="cai_1" data-from="JOIN_DAKMI_THANH" data-to="THANHMY"><path class="b94-river-outline" d="M508 630 C565 633 604 613 645 590" stroke-width="23"/><path id="b94-edge-cai_1" class="b94-river-core" d="M508 630 C565 633 604 613 645 590" stroke-width="15"/><path class="basin-water-motion" d="M508 630 C565 633 604 613 645 590"/></g><g data-edge="cai_2" data-from="THANHMY" data-to="JOIN_BUNG_CAI"><path class="b94-river-outline" d="M645 590 C702 545 771 508 835 510" stroke-width="23"/><path id="b94-edge-cai_2" class="b94-river-core" d="M645 590 C702 545 771 508 835 510" stroke-width="15"/><path class="basin-water-motion" d="M645 590 C702 545 771 508 835 510"/></g><g data-edge="vugia_hk" data-from="JOIN_BUNG_CAI" data-to="HOIKHACH"><path class="b94-river-outline" d="M835 510 C864 510 891 508 918 508" stroke-width="23"/><path id="b94-edge-vugia_hk" class="b94-river-core" d="M835 510 C864 510 891 508 918 508" stroke-width="15"/><path class="basin-water-motion" d="M835 510 C864 510 891 508 918 508"/></g><g data-edge="vugia_con" data-from="HOIKHACH" data-to="JOIN_CON_VUGIA"><path class="b94-river-outline" d="M918 508 C1000 498 1070 510 1142 530" stroke-width="23"/><path id="b94-edge-vugia_con" class="b94-river-core" d="M918 508 C1000 498 1070 510 1142 530" stroke-width="15"/><path class="basin-water-motion" d="M918 508 C1000 498 1070 510 1142 530"/></g><g data-edge="con_upper" data-from="SCON2" data-to="JOIN_CON_VANG"><path class="b94-river-outline" d="M973 211 C947 254 1002 295 1065 350" stroke-width="18"/><path id="b94-edge-con_upper" class="b94-river-core" d="M973 211 C947 254 1002 295 1065 350" stroke-width="10"/><path class="basin-water-motion" d="M973 211 C947 254 1002 295 1065 350"/></g><g data-edge="vang" data-from="ANDIEM_DAM" data-to="JOIN_CON_VANG"><path class="b94-river-outline" d="M1230 278 C1210 325 1121 319 1065 350" stroke-width="18"/><path id="b94-edge-vang" class="b94-river-core" d="M1230 278 C1210 325 1121 319 1065 350" stroke-width="10"/><path class="basin-water-motion" d="M1230 278 C1210 325 1121 319 1065 350"/></g><g data-edge="con_lower" data-from="JOIN_CON_VANG" data-to="JOIN_CON_VUGIA"><path class="b94-river-outline" d="M1065 350 C1108 411 1109 479 1142 530" stroke-width="18"/><path id="b94-edge-con_lower" class="b94-river-core" d="M1065 350 C1108 411 1109 479 1142 530" stroke-width="10"/><path class="basin-water-motion" d="M1065 350 C1108 411 1109 479 1142 530"/></g><g data-edge="vugia_split" data-from="JOIN_CON_VUGIA" data-to="SPLIT_VG_TB"><path class="b94-river-outline" d="M1142 530 C1230 551 1285 585 1360 610" stroke-width="23"/><path id="b94-edge-vugia_split" class="b94-river-core" d="M1142 530 C1230 551 1285 585 1360 610" stroke-width="15"/><path class="basin-water-motion" d="M1142 530 C1230 551 1285 585 1360 610"/></g><g data-edge="vugia_an" data-from="SPLIT_VG_TB" data-to="AINGHIA"><path class="b94-river-outline" d="M1360 610 C1410 630 1464 652 1515 653" stroke-width="23"/><path id="b94-edge-vugia_an" class="b94-river-core" d="M1360 610 C1410 630 1464 652 1515 653" stroke-width="15"/><path class="basin-water-motion" d="M1360 610 C1410 630 1464 652 1515 653"/></g><g data-edge="yen" data-from="AINGHIA" data-to="JOIN_YEN_TUYLOAN"><path class="b94-river-outline" d="M1515 653 C1570 648 1630 619 1660 565" stroke-width="23"/><path id="b94-edge-yen" class="b94-river-core" d="M1515 653 C1570 648 1630 619 1660 565" stroke-width="15"/><path class="basin-water-motion" d="M1515 653 C1570 648 1630 619 1660 565"/></g><g data-edge="tuyloan" data-from="TUYLOAN_SOURCE" data-to="JOIN_YEN_TUYLOAN"><path class="b94-river-outline" d="M1547 434 C1585 471 1610 531 1660 565" stroke-width="18"/><path id="b94-edge-tuyloan" class="b94-river-core" d="M1547 434 C1585 471 1610 531 1660 565" stroke-width="10"/><path class="basin-water-motion" d="M1547 434 C1585 471 1610 531 1660 565"/></g><g data-edge="camle" data-from="JOIN_YEN_TUYLOAN" data-to="CAMLE"><path class="b94-river-outline" d="M1660 565 C1678 534 1699 497 1715 462" stroke-width="23"/><path id="b94-edge-camle" class="b94-river-core" d="M1660 565 C1678 534 1699 497 1715 462" stroke-width="15"/><path class="basin-water-motion" d="M1660 565 C1678 534 1699 497 1715 462"/></g><g data-edge="han" data-from="CAMLE" data-to="HAN_OUT"><path class="b94-river-outline" d="M1715 462 C1745 409 1755 373 1770 335" stroke-width="23"/><path id="b94-edge-han" class="b94-river-core" d="M1715 462 C1745 409 1755 373 1770 335" stroke-width="15"/><path class="basin-water-motion" d="M1715 462 C1745 409 1755 373 1770 335"/></g><g data-edge="connector" data-from="SPLIT_VG_TB" data-to="GIAOTHUY"><path class="b94-river-outline" d="M1360 610 C1360 666 1390 720 1450 756 C1485 778 1515 795 1548 805" stroke-width="21"/><path id="b94-edge-connector" class="b94-river-core" d="M1360 610 C1360 666 1390 720 1450 756 C1485 778 1515 795 1548 805" stroke-width="13"/><path class="basin-water-motion" d="M1360 610 C1360 666 1390 720 1450 756 C1485 778 1515 795 1548 805"/></g><g data-edge="tranh_1" data-from="SONGTRANH2" data-to="TRAMY"><path class="b94-river-outline" d="M330 859 C405 870 472 878 558 881" stroke-width="23"/><path id="b94-edge-tranh_1" class="b94-river-core" d="M330 859 C405 870 472 878 558 881" stroke-width="15"/><path class="basin-water-motion" d="M330 859 C405 870 472 878 558 881"/></g><g data-edge="tranh_2" data-from="TRAMY" data-to="JOIN_TRANH_TIEN"><path class="b94-river-outline" d="M558 881 C593 886 630 890 665 891" stroke-width="23"/><path id="b94-edge-tranh_2" class="b94-river-core" d="M558 881 C593 886 630 890 665 891" stroke-width="15"/><path class="basin-water-motion" d="M558 881 C593 886 630 890 665 891"/></g><g data-edge="tien" data-from="TIEN_SOURCE" data-to="JOIN_TRANH_TIEN"><path class="b94-river-outline" d="M248 963 C418 920 560 941 665 891" stroke-width="18"/><path id="b94-edge-tien" class="b94-river-core" d="M248 963 C418 920 560 941 665 891" stroke-width="10"/><path class="basin-water-motion" d="M248 963 C418 920 560 941 665 891"/></g><g data-edge="upper_tb" data-from="THUBON_SOURCE" data-to="JOIN_UPPER_THUBON"><path class="b94-river-outline" d="M441 704 C545 733 706 806 850 866" stroke-width="18"/><path id="b94-edge-upper_tb" class="b94-river-core" d="M441 704 C545 733 706 806 850 866" stroke-width="10"/><path class="basin-water-motion" d="M441 704 C545 733 706 806 850 866"/></g><g data-edge="tb_1" data-from="JOIN_TRANH_TIEN" data-to="JOIN_UPPER_THUBON"><path class="b94-river-outline" d="M665 891 C742 884 803 879 850 866" stroke-width="23"/><path id="b94-edge-tb_1" class="b94-river-core" d="M665 891 C742 884 803 879 850 866" stroke-width="15"/><path class="basin-water-motion" d="M665 891 C742 884 803 879 850 866"/></g><g data-edge="tb_2" data-from="JOIN_UPPER_THUBON" data-to="NONGSON"><path class="b94-river-outline" d="M850 866 C939 858 987 841 1040 830" stroke-width="23"/><path id="b94-edge-tb_2" class="b94-river-core" d="M850 866 C939 858 987 841 1040 830" stroke-width="15"/><path class="basin-water-motion" d="M850 866 C939 858 987 841 1040 830"/></g><g data-edge="tb_3" data-from="NONGSON" data-to="GIAOTHUY"><path class="b94-river-outline" d="M1040 830 C1180 794 1420 799 1548 805" stroke-width="23"/><path id="b94-edge-tb_3" class="b94-river-core" d="M1040 830 C1180 794 1420 799 1548 805" stroke-width="15"/><path class="basin-water-motion" d="M1040 830 C1180 794 1420 799 1548 805"/></g><g data-edge="tb_4" data-from="GIAOTHUY" data-to="CAULAU"><path class="b94-river-outline" d="M1548 805 C1593 811 1620 820 1660 823" stroke-width="23"/><path id="b94-edge-tb_4" class="b94-river-core" d="M1548 805 C1593 811 1620 820 1660 823" stroke-width="15"/><path class="basin-water-motion" d="M1548 805 C1593 811 1620 820 1660 823"/></g><g data-edge="tb_5" data-from="CAULAU" data-to="THUBON_OUT"><path class="b94-river-outline" d="M1660 823 L1774 832" stroke-width="23"/><path id="b94-edge-tb_5" class="b94-river-core" d="M1660 823 L1774 832" stroke-width="15"/><path class="basin-water-motion" d="M1660 823 L1774 832"/></g></g><g id="b94FlowArrows" aria-hidden="true"></g><path d="M315 628C410 691 525 748 673.776 791.408" class="b94-transfer"/><text x="378" y="712" class="b94-transfer-label" transform="rotate(17 378 712)">Chuyển nước Đăk Mi 4 (khái quát)</text><text x="397" y="346" class="b94-river-label" transform="rotate(22 397 346)" >Sông Bung</text><text x="614" y="281" class="b94-river-label" text-anchor="end" >Sông A Vương</text><text x="397" y="465" class="b94-river-label" transform="rotate(50 397 465)" >Sông Thanh</text><text x="366" y="616" class="b94-river-label" transform="rotate(8 366 616)" >Sông Đăk Mi</text><text x="676" y="550" class="b94-river-label" transform="rotate(-18 676 550)" >Sông Cái</text><text x="998" y="274" class="b94-river-label" transform="rotate(50 998 274)" >Sông Côn</text><text x="1114" y="307" class="b94-river-label" transform="rotate(-16 1114 307)" >Sông Vàng</text><text x="1181" y="538" class="b94-river-label" transform="rotate(22 1181 538)" >Sông Vu Gia</text><text x="1563" y="618" class="b94-river-label" transform="rotate(-32 1563 618)" >Sông Yên</text><text x="1562" y="458" class="b94-river-label" transform="rotate(46 1562 458)" >Sông Túy Loan</text><text x="1732" y="420" class="b94-river-label" transform="rotate(-61 1732 420)" >Sông Hàn</text><text x="386" y="844" class="b94-river-label" transform="rotate(6 386 844)" >Sông Tranh</text><text x="405" y="958" class="b94-river-label" transform="rotate(-8 405 958)" >Sông Tiên</text><text x="555" y="743" class="b94-river-label" transform="rotate(23 555 743)" >Ngọn Thu Bồn</text><text x="1170" y="779" class="b94-river-label" transform="rotate(0 1170 779)" >Sông Thu Bồn</text><path d="M1314 708H1405" stroke="#b0edf6" stroke-width="1.3" opacity=".7"/><text x="1304" y="692" class="b94-connector-label" text-anchor="end" >Nhánh nối</text><text x="1304" y="714" class="b94-connector-label" text-anchor="end" >Vu Gia – Thu Bồn</text><text x="1304" y="733" class="b94-connector-sub" text-anchor="end" >Tới Giao Thủy</text><g id="dam-SB2" class="b94-dam" aria-label="TĐ Sông Bung 2"><title>TĐ Sông Bung 2</title><use href="#b94Dam" x="125.64" y="103.2" width="38.72" height="35.2"/></g><text x="155" y="101" class="b94-plant-label" text-anchor="middle" >TĐ Sông Bung 2</text><g id="dam-SB4" class="b94-dam" data-basin-open="SONGBUNG4" data-basin-kind="reservoir" role="button" tabindex="0" aria-label="TĐ Sông Bung 4"><title>TĐ Sông Bung 4</title><use href="#b94Dam" x="339.7" y="280.75" width="50.599999999999994" height="46.0"/></g><g id="dam-AVUONG" class="b94-dam" data-basin-open="AVUONG" data-basin-kind="reservoir" role="button" tabindex="0" aria-label="TĐ A Vương"><title>TĐ A Vương</title><use href="#b94Dam" x="637.7" y="188.75" width="50.599999999999994" height="46.0"/></g><g id="dam-DAKMI4" class="b94-dam" data-basin-open="DAKMI4" data-basin-kind="reservoir" role="button" tabindex="0" aria-label="TĐ Đăk Mi 4"><title>TĐ Đăk Mi 4</title><use href="#b94Dam" x="284.7" y="566.75" width="50.599999999999994" height="46.0"/></g><g id="dam-SONGTRANH2" class="b94-dam" data-basin-open="SONGTRANH2" data-basin-kind="reservoir" role="button" tabindex="0" aria-label="TĐ Sông Tranh 2"><title>TĐ Sông Tranh 2</title><use href="#b94Dam" x="304.7" y="818.75" width="50.599999999999994" height="46.0"/></g><g id="dam-SB4A" class="b94-dam" aria-label="TĐ SB4A"><title>TĐ SB4A</title><use href="#b94Dam" x="590.64" y="371.2" width="38.72" height="35.2"/></g><text x="597" y="363" class="b94-plant-label" text-anchor="middle" >TĐ SB4A</text><g id="dam-SB5" class="b94-dam" aria-label="TĐ SB5"><title>TĐ SB5</title><use href="#b94Dam" x="667.64" y="413.2" width="38.72" height="35.2"/></g><text x="682" y="402" class="b94-plant-label" text-anchor="middle" >TĐ SB5</text><g id="dam-SB6" class="b94-dam" aria-label="TĐ SB6"><title>TĐ SB6</title><use href="#b94Dam" x="744.64" y="452.2" width="38.72" height="35.2"/></g><text x="770" y="433" class="b94-plant-label" text-anchor="middle" >TĐ SB6</text><text x="775" y="451" class="b94-small-label" text-anchor="middle" >(Tràn tự do)</text><g id="dam-SCON2" class="b94-dam" aria-label="TĐ Sông Côn 2"><title>TĐ Sông Côn 2</title><use href="#b94Dam" x="953.64" y="180.2" width="38.72" height="35.2"/></g><text x="974" y="172" class="b94-plant-label" text-anchor="middle" >TĐ Sông Côn 2</text><g id="dam-ANDIEM_DAM" class="b94-dam" aria-label="TĐ An Điềm"><title>TĐ An Điềm</title><use href="#b94Dam" x="1210.64" y="247.2" width="38.72" height="35.2"/></g><text x="1234" y="239" class="b94-plant-label" text-anchor="middle" >TĐ An Điềm</text><g id="b94-marker-HOIKHACH" class="b94-station is-live" data-node-id="HOIKHACH" data-x="918" data-y="508" data-basin-open="HOIKHACH" data-basin-kind="gauge" role="button" tabindex="0" aria-label="Hội Khách"><title>Hội Khách</title><circle cx="918" cy="508" r="14" fill="#ff7c80" opacity=".14"/><circle cx="918" cy="508" r="8" fill="#ff686f" stroke="#fff4e9" stroke-width="2.5"/></g><text x="918" y="478" class="b94-station-label" text-anchor="middle" >Hội Khách</text><text x="918" y="494" class="b94-small-label" text-anchor="middle" >(Đại Sơn)</text><g id="b94-marker-AINGHIA" class="b94-station is-live" data-node-id="AINGHIA" data-x="1515" data-y="653" data-basin-open="AINGHIA" data-basin-kind="gauge" role="button" tabindex="0" aria-label="Ái Nghĩa"><title>Ái Nghĩa</title><circle cx="1515" cy="653" r="14" fill="#ff7c80" opacity=".14"/><circle cx="1515" cy="653" r="8" fill="#ff686f" stroke="#fff4e9" stroke-width="2.5"/></g><text x="1541" y="686" class="b94-station-label" text-anchor="middle" >Ái Nghĩa</text><g id="b94-marker-THANHMY" class="b94-station " data-node-id="THANHMY" data-x="645" data-y="590" aria-label="Thành Mỹ"><title>Thành Mỹ</title><circle cx="645" cy="590" r="5.5" fill="#ff686f" stroke="#fff4e9" stroke-width="1.7"/></g><text x="637" y="628" class="b94-station-label" text-anchor="middle" >Thành Mỹ</text><g id="b94-marker-TRAMY" class="b94-station " data-node-id="TRAMY" data-x="558" data-y="881" aria-label="Trà My"><title>Trà My</title><circle cx="558" cy="881" r="5.5" fill="#ff686f" stroke="#fff4e9" stroke-width="1.7"/></g><text x="558" y="917" class="b94-station-label" text-anchor="middle" >Trà My</text><g id="b94-marker-NONGSON" class="b94-station " data-node-id="NONGSON" data-x="1040" data-y="830" aria-label="Nông Sơn"><title>Nông Sơn</title><circle cx="1040" cy="830" r="5.5" fill="#ff686f" stroke="#fff4e9" stroke-width="1.7"/></g><text x="1050" y="868" class="b94-station-label" text-anchor="middle" >Nông Sơn</text><g id="b94-marker-GIAOTHUY" class="b94-station " data-node-id="GIAOTHUY" data-x="1548" data-y="805" aria-label="Giao Thủy"><title>Giao Thủy</title><circle cx="1548" cy="805" r="5.5" fill="#ff686f" stroke="#fff4e9" stroke-width="1.7"/></g><text x="1518" y="776" class="b94-station-label" text-anchor="middle" >Giao Thủy</text><g id="b94-marker-CAULAU" class="b94-station " data-node-id="CAULAU" data-x="1660" data-y="823" aria-label="Cầu Lâu"><title>Cầu Lâu</title><circle cx="1660" cy="823" r="5.5" fill="#ff686f" stroke="#fff4e9" stroke-width="1.7"/></g><text x="1670" y="796" class="b94-station-label" text-anchor="middle" >Cầu Lâu</text><g id="b94-marker-CAMLE" class="b94-station " data-node-id="CAMLE" data-x="1715" data-y="462" aria-label="Cẩm Lệ"><title>Cẩm Lệ</title><circle cx="1715" cy="462" r="5.5" fill="#ff686f" stroke="#fff4e9" stroke-width="1.7"/></g><text x="1697" y="431" class="b94-station-label" text-anchor="end" >Cẩm Lệ</text><circle cx="1065" cy="350" r="6" fill="#ffe077" stroke="#faffd4" stroke-width="1.5"/><text x="1095" y="357" class="b94-place-label" >An Điềm</text><circle cx="1170" cy="508" r="6" fill="#ffe077" stroke="#faffd4" stroke-width="1.5"/><text x="1136" y="475" class="b94-place-label" >Hà Tân</text><text x="1095" y="375" class="b94-small-label" >(Đại Hưng)</text><text x="1136" y="493" class="b94-small-label" >(Đại Lãnh)</text><circle id="b94-junction-JOIN_AV_BUNG" class="b94-junction" data-node-id="JOIN_AV_BUNG" cx="550" cy="380" r="4"/><circle id="b94-junction-JOIN_BUNG_CAI" class="b94-junction" data-node-id="JOIN_BUNG_CAI" cx="835" cy="510" r="4"/><circle id="b94-junction-JOIN_CON_VUGIA" class="b94-junction" data-node-id="JOIN_CON_VUGIA" cx="1142" cy="530" r="4"/><circle id="b94-junction-SPLIT_VG_TB" class="b94-junction" data-node-id="SPLIT_VG_TB" cx="1360" cy="610" r="4"/><text x="1338" y="651" class="b94-small-label" text-anchor="end" >Điểm tách nhánh</text><g class="b94-card-leaders" fill="none" stroke-width="1.4" stroke-dasharray="4 5"><path d="M320 316H343" stroke="#5de9ab" opacity=".85"/><path d="M682 177L663 194" stroke="#60cbff" opacity=".85"/><path d="M281 576L307 582" stroke="#c0a0ff" opacity=".85"/><path d="M306 838L319 846" stroke="#ffbd70" opacity=".85"/><path d="M918 518V560" stroke="#ffa1a5" opacity=".85"/><path d="M1460 534L1510 637" stroke="#ffa1a5" opacity=".85"/></g><g transform="translate(1460 53)"><rect width="303" height="116" rx="14" fill="#07283b" stroke="#426579"/>
+<text x="15" y="25" class="b94-key-title">CHÚ GIẢI</text><path d="M17 47H53" stroke="#62d6f9" stroke-width="6" marker-end="url(#b94Arrow)"/><text x="69" y="52" class="b94-key-text">Sông / hướng dòng minh họa</text>
+<circle cx="26" cy="75" r="5" fill="#ff686f" stroke="#fff4e9"/><text x="69" y="79" class="b94-key-text">Trạm / mốc theo sơ đồ</text>
+<use href="#b94Dam" x="17" y="87" width="22" height="20"/><text x="69" y="104" class="b94-key-text">Nhà máy thủy điện</text></g><g class="b94-cardless"><text x="365" y="277" class="b94-plant-label" text-anchor="middle" >Hồ Sông Bung 4</text><text x="663" y="187" class="b94-plant-label" text-anchor="middle" >Hồ A Vương</text><text x="310" y="563" class="b94-plant-label" text-anchor="middle" >Hồ Đăk Mi 4</text><text x="330" y="815" class="b94-plant-label" text-anchor="middle" >Hồ Sông Tranh 2</text></g><foreignObject x="34" y="216" width="286" height="144" class="b94-card-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="b94-card-wrap"><button type="button" class="basin-node " data-basin-code="SONGBUNG4" data-basin-type="reservoir" style="--bnode:#67e2bd" aria-label="Hồ Sông Bung 4">
+<span class="basin-node-header"><strong class="basin-node-title">Hồ Sông Bung 4</strong><span class="basin-node-tag is-missing" data-field="status">Đang tải</span></span>
+<span class="basin-node-reading"><small>MNH</small><b data-field="level">—</b><em>m</em></span><span class="basin-node-flow"><span>Q về <b data-field="inflow">—</b></span><span>Q máy <b data-field="turbine">—</b></span><span>Q tràn <b data-field="spill">—</b></span><em>m³/s</em></span><span class="basin-node-time" data-field="stamp">Nguồn: PCTT Đà Nẵng</span></button></div></foreignObject><foreignObject x="537" y="32" width="294" height="145" class="b94-card-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="b94-card-wrap"><button type="button" class="basin-node " data-basin-code="AVUONG" data-basin-type="reservoir" style="--bnode:#64d7ff" aria-label="Hồ A Vương">
+<span class="basin-node-header"><strong class="basin-node-title">Hồ A Vương</strong><span class="basin-node-tag is-missing" data-field="status">Đang tải</span></span>
+<span class="basin-node-reading"><small>MNH</small><b data-field="level">—</b><em>m</em></span><span class="basin-node-flow"><span>Q về <b data-field="inflow">—</b></span><span>Q máy <b data-field="turbine">—</b></span><span>Q tràn <b data-field="spill">—</b></span><em>m³/s</em></span><span class="basin-node-time" data-field="stamp">Nguồn: PCTT Đà Nẵng</span></button></div></foreignObject><foreignObject x="34" y="432" width="284" height="144" class="b94-card-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="b94-card-wrap"><button type="button" class="basin-node " data-basin-code="DAKMI4" data-basin-type="reservoir" style="--bnode:#c6acff" aria-label="Hồ Đăk Mi 4">
+<span class="basin-node-header"><strong class="basin-node-title">Hồ Đăk Mi 4</strong><span class="basin-node-tag is-missing" data-field="status">Đang tải</span></span>
+<span class="basin-node-reading"><small>MNH</small><b data-field="level">—</b><em>m</em></span><span class="basin-node-flow"><span>Q về <b data-field="inflow">—</b></span><span>Q máy <b data-field="turbine">—</b></span><span>Q tràn <b data-field="spill">—</b></span><em>m³/s</em></span><span class="basin-node-time" data-field="stamp">Nguồn: PCTT Đà Nẵng</span></button></div></foreignObject><foreignObject x="34" y="694" width="293" height="144" class="b94-card-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="b94-card-wrap"><button type="button" class="basin-node " data-basin-code="SONGTRANH2" data-basin-type="reservoir" style="--bnode:#ffd08a" aria-label="Hồ Sông Tranh 2">
+<span class="basin-node-header"><strong class="basin-node-title">Hồ Sông Tranh 2</strong><span class="basin-node-tag is-missing" data-field="status">Đang tải</span></span>
+<span class="basin-node-reading"><small>MNH</small><b data-field="level">—</b><em>m</em></span><span class="basin-node-flow"><span>Q về <b data-field="inflow">—</b></span><span>Q máy <b data-field="turbine">—</b></span><span>Q tràn <b data-field="spill">—</b></span><em>m³/s</em></span><span class="basin-node-time" data-field="stamp">Nguồn: PCTT Đà Nẵng</span></button></div></foreignObject><foreignObject x="849" y="564" width="303" height="134" class="b94-card-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="b94-card-wrap"><button type="button" class="basin-node basin-node-gauge" data-basin-code="HOIKHACH" data-basin-type="gauge" style="--bnode:#70ead4" aria-label="Trạm TV Hội Khách">
+<span class="basin-node-header"><strong class="basin-node-title">Trạm TV Hội Khách</strong><span class="basin-node-tag is-missing" data-field="status">Đang tải</span></span>
+<span class="basin-node-reading"><small>Mực nước</small><b data-field="level">—</b><em>m</em></span><span class="basin-node-forecast">Dự báo +4 giờ <b data-field="forecast">—</b><span>m</span></span><span class="basin-node-time" data-field="stamp">Nguồn: PCTT Đà Nẵng</span></button></div></foreignObject><foreignObject x="1231" y="389" width="306" height="145" class="b94-card-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="b94-card-wrap"><button type="button" class="basin-node basin-node-gauge" data-basin-code="AINGHIA" data-basin-type="gauge" style="--bnode:#70ead4" aria-label="Trạm TV Ái Nghĩa">
+<span class="basin-node-header"><strong class="basin-node-title">Trạm TV Ái Nghĩa</strong><span class="basin-node-tag is-missing" data-field="status">Đang tải</span></span>
+<span class="basin-node-reading"><small>Mực nước</small><b data-field="level">—</b><em>m</em></span><span class="basin-node-forecast">Dự báo +4 giờ <b data-field="forecast">—</b><span>m</span></span><span class="basin-node-time" data-field="stamp">Nguồn: PCTT Đà Nẵng</span></button></div></foreignObject></svg>
+    </div>
+   <button class="basin-exit" id="basinExitFullscreen" type="button">✕ Thoát toàn màn hình</button>
+ </div>
+ <div class="basin-map-key"><span><i style="--swatch:#60d9fb"></i>Sông / hướng dòng minh họa</span><span><i style="--swatch:#ff686f"></i>Trạm / mốc theo sơ đồ</span><span>Q: m³/s · Mực nước: m</span><span class="basin-touch-tip">↔ Vuốt ngang để xem trên điện thoại</span></div>
+ <div class="basin-info-line">Nguồn số liệu: <a href="https://pctt.danang.gov.vn/" target="_blank" rel="noopener noreferrer" style="color:#7edfff">PCTT Đà Nẵng</a> (hạ du qua Supabase). Sơ đồ nguyên lý, không theo tỷ lệ; hoạt ảnh không biểu diễn vận tốc hoặc thời gian truyền lũ.</div>
+</section>
+ <dialog class="basin-dlg" id="basinGaugeDialog" aria-labelledby="basinGaugeTitle">
+   <div class="basin-dlg-head"><div><h3 id="basinGaugeTitle">Trạm thủy văn</h3><div class="basin-dlg-sub" id="basinGaugeSubtitle"></div></div><button class="basin-action" id="basinGaugeClose" type="button">✕ Đóng</button></div>
+   <div class="basin-dlg-value" id="basinGaugeLevel">— m</div>
+   <div class="basin-dlg-rows" id="basinGaugeRows"></div>
+   <div class="basin-dlg-warning" id="basinGaugeStatus"></div>
+ </dialog>
+
   <section class="site-view v9-workspace" id="view-flood" role="tabpanel" aria-labelledby="tabFlood" hidden>
     <div class="v9-title-row"><div><h2>Bản đồ mốc lũ hạ du Vu Gia – Thu Bồn</h2><p>Google My Maps do bạn cung cấp · danh mục mốc tham chiếu lấy thêm từ API AVC khi truy cập được</p></div><div class="v9-map-links"><a id="floodOpenMap" href="https://www.google.com/maps/d/viewer?mid=1OuvFULZypRbV6ABno2txIHFKzQ6nIhc&amp;ll=15.856178789126743%2C107.98933315000001&amp;z=12" target="_blank" rel="noopener noreferrer">↗ Mở Google My Maps</a><button id="floodFullscreenBtn" type="button" class="btn">⛶ Toàn màn hình bản đồ</button><button id="floodReload" type="button" class="btn">↻ Tải lại</button></div></div>
     <div class="v9-map-grid"><div class="v9-embed-container" id="floodEmbedContainer"><iframe id="floodFrame" title="Google My Maps – Các mốc lũ hạ du Vu Gia Thu Bồn" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
@@ -572,6 +788,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
   </section>
 </div>
 <dialog id="detailDialog" class="detail-dialog"><div class="detail-content" id="detailContent"></div></dialog>
+<script type="application/json" id="basinTopologyConfig">{"schema":"avc-basin-schematic-1","coordinateSystem":"schematic-svg-not-GIS","viewBox":[0,0,1800,1000],"nodes":{"SB2":[145,134],"SB4":[365,321],"AVUONG":[663,229],"JOIN_AV_BUNG":[550,380],"SB4A":[610,402],"SB5":[687,444],"SB6":[764,483],"JOIN_BUNG_CAI":[835,510],"DAKMI4":[310,607],"THANH_SOURCE":[340,390],"JOIN_DAKMI_THANH":[508,630],"THANHMY":[645,590],"HOIKHACH":[918,508],"SCON2":[973,211],"ANDIEM_DAM":[1230,278],"JOIN_CON_VANG":[1065,350],"JOIN_CON_VUGIA":[1142,530],"SPLIT_VG_TB":[1360,610],"AINGHIA":[1515,653],"JOIN_YEN_TUYLOAN":[1660,565],"TUYLOAN_SOURCE":[1547,434],"CAMLE":[1715,462],"HAN_OUT":[1770,335],"SONGTRANH2":[330,859],"TRAMY":[558,881],"JOIN_TRANH_TIEN":[665,891],"TIEN_SOURCE":[248,963],"THUBON_SOURCE":[441,704],"JOIN_UPPER_THUBON":[850,866],"NONGSON":[1040,830],"GIAOTHUY":[1548,805],"CAULAU":[1660,823],"THUBON_OUT":[1774,832]},"edges":[{"id":"bung2_4","source":"SB2","target":"SB4","path":"M145 134 C267 154 363 216 365 321","kind":"main"},{"id":"bung4_join","source":"SB4","target":"JOIN_AV_BUNG","path":"M365 321 C410 347 480 370 550 380","kind":"main"},{"id":"av_join","source":"AVUONG","target":"JOIN_AV_BUNG","path":"M663 229 C689 280 604 310 550 380","kind":"trib"},{"id":"bung_4a","source":"JOIN_AV_BUNG","target":"SB4A","path":"M550 380 C572 386 594 393 610 402","kind":"main"},{"id":"bung_5","source":"SB4A","target":"SB5","path":"M610 402 C640 415 662 428 687 444","kind":"main"},{"id":"bung_6","source":"SB5","target":"SB6","path":"M687 444 C716 462 740 475 764 483","kind":"main"},{"id":"bung_cai","source":"SB6","target":"JOIN_BUNG_CAI","path":"M764 483 C789 497 811 507 835 510","kind":"main"},{"id":"dakmi","source":"DAKMI4","target":"JOIN_DAKMI_THANH","path":"M310 607 C388 614 423 632 508 630","kind":"trib"},{"id":"thanh","source":"THANH_SOURCE","target":"JOIN_DAKMI_THANH","path":"M340 390 C401 441 411 555 508 630","kind":"trib"},{"id":"cai_1","source":"JOIN_DAKMI_THANH","target":"THANHMY","path":"M508 630 C565 633 604 613 645 590","kind":"main"},{"id":"cai_2","source":"THANHMY","target":"JOIN_BUNG_CAI","path":"M645 590 C702 545 771 508 835 510","kind":"main"},{"id":"vugia_hk","source":"JOIN_BUNG_CAI","target":"HOIKHACH","path":"M835 510 C864 510 891 508 918 508","kind":"main"},{"id":"vugia_con","source":"HOIKHACH","target":"JOIN_CON_VUGIA","path":"M918 508 C1000 498 1070 510 1142 530","kind":"main"},{"id":"con_upper","source":"SCON2","target":"JOIN_CON_VANG","path":"M973 211 C947 254 1002 295 1065 350","kind":"trib"},{"id":"vang","source":"ANDIEM_DAM","target":"JOIN_CON_VANG","path":"M1230 278 C1210 325 1121 319 1065 350","kind":"trib"},{"id":"con_lower","source":"JOIN_CON_VANG","target":"JOIN_CON_VUGIA","path":"M1065 350 C1108 411 1109 479 1142 530","kind":"trib"},{"id":"vugia_split","source":"JOIN_CON_VUGIA","target":"SPLIT_VG_TB","path":"M1142 530 C1230 551 1285 585 1360 610","kind":"main"},{"id":"vugia_an","source":"SPLIT_VG_TB","target":"AINGHIA","path":"M1360 610 C1410 630 1464 652 1515 653","kind":"main"},{"id":"yen","source":"AINGHIA","target":"JOIN_YEN_TUYLOAN","path":"M1515 653 C1570 648 1630 619 1660 565","kind":"main"},{"id":"tuyloan","source":"TUYLOAN_SOURCE","target":"JOIN_YEN_TUYLOAN","path":"M1547 434 C1585 471 1610 531 1660 565","kind":"trib"},{"id":"camle","source":"JOIN_YEN_TUYLOAN","target":"CAMLE","path":"M1660 565 C1678 534 1699 497 1715 462","kind":"main"},{"id":"han","source":"CAMLE","target":"HAN_OUT","path":"M1715 462 C1745 409 1755 373 1770 335","kind":"main"},{"id":"connector","source":"SPLIT_VG_TB","target":"GIAOTHUY","path":"M1360 610 C1360 666 1390 720 1450 756 C1485 778 1515 795 1548 805","kind":"connector"},{"id":"tranh_1","source":"SONGTRANH2","target":"TRAMY","path":"M330 859 C405 870 472 878 558 881","kind":"main"},{"id":"tranh_2","source":"TRAMY","target":"JOIN_TRANH_TIEN","path":"M558 881 C593 886 630 890 665 891","kind":"main"},{"id":"tien","source":"TIEN_SOURCE","target":"JOIN_TRANH_TIEN","path":"M248 963 C418 920 560 941 665 891","kind":"trib"},{"id":"upper_tb","source":"THUBON_SOURCE","target":"JOIN_UPPER_THUBON","path":"M441 704 C545 733 706 806 850 866","kind":"trib"},{"id":"tb_1","source":"JOIN_TRANH_TIEN","target":"JOIN_UPPER_THUBON","path":"M665 891 C742 884 803 879 850 866","kind":"main"},{"id":"tb_2","source":"JOIN_UPPER_THUBON","target":"NONGSON","path":"M850 866 C939 858 987 841 1040 830","kind":"main"},{"id":"tb_3","source":"NONGSON","target":"GIAOTHUY","path":"M1040 830 C1180 794 1420 799 1548 805","kind":"main"},{"id":"tb_4","source":"GIAOTHUY","target":"CAULAU","path":"M1548 805 C1593 811 1620 820 1660 823","kind":"main"},{"id":"tb_5","source":"CAULAU","target":"THUBON_OUT","path":"M1660 823 L1774 832","kind":"main"}],"constraints":{"hoiKhachAfter":"JOIN_BUNG_CAI","hoiKhachBefore":"JOIN_CON_VUGIA","connectorStart":"SPLIT_VG_TB","connectorBefore":"AINGHIA","connectorEnd":"GIAOTHUY","sb6Before":"JOIN_BUNG_CAI"}}</script>
 <script type="application/json" id="embeddedConfig">{"schema":"avc-reservoirs-v1","description":"Master data: 4 hồ thủy điện + trạm mực nước hạ du - tham chiếu Quyết định 1865/QĐ-TTg","units":{"level":"m","storage":"million_m3","surface":"km2","flow":"m3/s"},"source":{"document":"Quyết định 1865/QĐ-TTg ngày 23/12/2019, Quy trình vận hành liên hồ chứa trên lưu vực sông Vu Gia - Thu Bồn","pdf_pages":52,"government_url":"https://chinhphu.vn/default.aspx?docid=198732&pageid=27160","appendix_I_parameters_pdf_pages":[41,42,43],"appendix_II_zfw_pdf_pages":[45,46,47,48],"table_1_2_pdf_page":5,"appendix_III_pdf_pages":[51,52],"status_note":"Nguồn nền tham chiếu theo bản đính kèm năm 2019; trước khi dùng để chỉ đạo vận hành phải đối chiếu hiệu lực/điều chỉnh mới."},"reservoirs":[{"id":1,"code":"AVUONG","name":"A Vương","short_name":"A Vương","branch":"Vu Gia","mnc":340.0,"mndbt":380.0,"spillway_crest_m":363.0,"dam_crest_m":383.4,"capacity_total_mcm":343.55,"capacity_active_mcm":266.48,"capacity_dead_mcm":77.07,"spill_bays":3,"gate_dimensions_m":"14 x 17.5","turbine_qmax_m3s":78.4,"plant_capacity_mw":210,"units":2,"basin_area_km2":682,"annual_mean_inflow_m3s":39.8,"source_pages":{"parameters":[41,42,43],"curve":45},"flood_rules":{"early_highest":376.0,"late_highest_range":[377.0,380.0],"early_min_receive":370.0,"late_min_receive":377.0},"curve_zfw":[{"z_m":306,"area_km2":0,"storage_mcm":0},{"z_m":310,"area_km2":0.31,"storage_mcm":0.66},{"z_m":320,"area_km2":1.89,"storage_mcm":11.96},{"z_m":330,"area_km2":3.3,"storage_mcm":38.9},{"z_m":340,"area_km2":4.34,"storage_mcm":77.07},{"z_m":345,"area_km2":4.89,"storage_mcm":100.13},{"z_m":350,"area_km2":5.47,"storage_mcm":126.01},{"z_m":355,"area_km2":6.02,"storage_mcm":154.73},{"z_m":360,"area_km2":6.61,"storage_mcm":186.29},{"z_m":365,"area_km2":7.24,"storage_mcm":220.9},{"z_m":370,"area_km2":7.89,"storage_mcm":258.72},{"z_m":375,"area_km2":8.48,"storage_mcm":299.63},{"z_m":380,"area_km2":9.09,"storage_mcm":343.55},{"z_m":385,"area_km2":9.75,"storage_mcm":390.64},{"z_m":390,"area_km2":10.4,"storage_mcm":441.01},{"z_m":395,"area_km2":11.05,"storage_mcm":494.62},{"z_m":400,"area_km2":11.66,"storage_mcm":551.39}],"demo":{"level":373.4,"inflow":130,"turbine":48,"spill":92,"gate":25,"delta24":0.28}},{"id":2,"code":"DAKMI4","name":"Đăk Mi 4","short_name":"Đăk Mi 4","branch":"Vu Gia - Thu Bồn (phân lưu)","mnc":240.0,"mndbt":258.0,"spillway_crest_m":242.5,"dam_crest_m":262.0,"capacity_total_mcm":312.38,"capacity_active_mcm":158.26,"capacity_dead_mcm":154.12,"spill_bays":5,"gate_dimensions_m":"14 x 16","turbine_qmax_m3s":128,"plant_capacity_mw":148,"units":2,"basin_area_km2":1125,"annual_mean_inflow_m3s":67.8,"source_pages":{"parameters":[41,42,43],"curve":47},"flood_rules":{"early_highest":255.0,"late_highest_range":[256.0,258.0],"early_min_receive":251.5,"late_min_receive":256.0},"curve_zfw":[{"z_m":175,"area_km2":0,"storage_mcm":0},{"z_m":180,"area_km2":0.09,"storage_mcm":0.22},{"z_m":185,"area_km2":0.28,"storage_mcm":1.14},{"z_m":190,"area_km2":0.66,"storage_mcm":3.49},{"z_m":195,"area_km2":0.91,"storage_mcm":7.39},{"z_m":200,"area_km2":1.26,"storage_mcm":12.81},{"z_m":205,"area_km2":1.56,"storage_mcm":19.87},{"z_m":210,"area_km2":1.92,"storage_mcm":28.57},{"z_m":215,"area_km2":2.33,"storage_mcm":39.19},{"z_m":220,"area_km2":2.95,"storage_mcm":52.39},{"z_m":225,"area_km2":3.93,"storage_mcm":69.6},{"z_m":230,"area_km2":5.08,"storage_mcm":92.14},{"z_m":235,"area_km2":6.31,"storage_mcm":120.61},{"z_m":240,"area_km2":7.1,"storage_mcm":154.12},{"z_m":245,"area_km2":8.0,"storage_mcm":191.86},{"z_m":250,"area_km2":8.91,"storage_mcm":234.13},{"z_m":255,"area_km2":9.97,"storage_mcm":281.31},{"z_m":260,"area_km2":10.8,"storage_mcm":333.09},{"z_m":265,"area_km2":11.84,"storage_mcm":389.68},{"z_m":270,"area_km2":12.87,"storage_mcm":451.45}],"demo":{"level":253.7,"inflow":105,"turbine":82,"spill":0,"gate":0,"delta24":-0.14}},{"id":3,"code":"SONGBUNG4","name":"Sông Bung 4","short_name":"Sông Bung 4","branch":"Vu Gia","mnc":205.0,"mndbt":222.5,"spillway_crest_m":210.5,"dam_crest_m":229.0,"capacity_total_mcm":510.8,"capacity_active_mcm":233.99,"capacity_dead_mcm":276.81,"spill_bays":6,"gate_dimensions_m":"12 x 12","turbine_qmax_m3s":166,"plant_capacity_mw":156,"units":2,"basin_area_km2":1448,"annual_mean_inflow_m3s":73.7,"source_pages":{"parameters":[41,42,43],"curve":48},"flood_rules":{"early_highest":217.5,"late_highest_range":[218.5,222.5],"early_min_receive":216.0,"late_min_receive":218.5},"curve_zfw":[{"z_m":125,"area_km2":0.159,"storage_mcm":0.265},{"z_m":130,"area_km2":0.338,"storage_mcm":1.48},{"z_m":135,"area_km2":0.448,"storage_mcm":3.438},{"z_m":140,"area_km2":0.589,"storage_mcm":6.022},{"z_m":145,"area_km2":0.784,"storage_mcm":9.443},{"z_m":150,"area_km2":1.055,"storage_mcm":14.02},{"z_m":155,"area_km2":1.298,"storage_mcm":19.89},{"z_m":160,"area_km2":1.649,"storage_mcm":27.24},{"z_m":165,"area_km2":2.231,"storage_mcm":36.91},{"z_m":170,"area_km2":3.104,"storage_mcm":50.18},{"z_m":175,"area_km2":3.926,"storage_mcm":67.72},{"z_m":180,"area_km2":4.593,"storage_mcm":88.99},{"z_m":185,"area_km2":5.649,"storage_mcm":114.6},{"z_m":190,"area_km2":6.817,"storage_mcm":145.7},{"z_m":195,"area_km2":8.056,"storage_mcm":182.8},{"z_m":200,"area_km2":9.387,"storage_mcm":226.4},{"z_m":205,"area_km2":10.8,"storage_mcm":276.8},{"z_m":210,"area_km2":12.26,"storage_mcm":334.4},{"z_m":215,"area_km2":13.7,"storage_mcm":399.3},{"z_m":220,"area_km2":15.27,"storage_mcm":471.7},{"z_m":225,"area_km2":16.03,"storage_mcm":549.9},{"z_m":230,"area_km2":18.8,"storage_mcm":636.9},{"z_m":235,"area_km2":20.48,"storage_mcm":735.1},{"z_m":240,"area_km2":22.25,"storage_mcm":841.8},{"z_m":245,"area_km2":24.17,"storage_mcm":957.8},{"z_m":250,"area_km2":26.32,"storage_mcm":1084}],"demo":{"level":217.1,"inflow":145,"turbine":70,"spill":230,"gate":65,"delta24":0.35}},{"id":4,"code":"SONGTRANH2","name":"Sông Tranh 2","short_name":"Sông Tranh 2","branch":"Thu Bồn","mnc":140.0,"mndbt":175.0,"spillway_crest_m":161.0,"dam_crest_m":180.0,"capacity_total_mcm":729.2,"capacity_active_mcm":521.1,"capacity_dead_mcm":208.1,"spill_bays":6,"gate_dimensions_m":"14 x 14","turbine_qmax_m3s":245,"plant_capacity_mw":190,"units":2,"basin_area_km2":1100,"annual_mean_inflow_m3s":114.0,"source_pages":{"parameters":[41,42,43],"curve":46},"flood_rules":{"early_highest":172.0,"late_highest_range":[173.0,175.0],"early_min_receive":165.0,"late_min_receive":173.0},"curve_zfw":[{"z_m":89.5,"area_km2":0,"storage_mcm":0},{"z_m":90,"area_km2":0.02,"storage_mcm":0},{"z_m":95,"area_km2":0.49,"storage_mcm":1.02},{"z_m":100,"area_km2":1.06,"storage_mcm":4.8},{"z_m":105,"area_km2":1.97,"storage_mcm":12.26},{"z_m":110,"area_km2":3.17,"storage_mcm":24.99},{"z_m":115,"area_km2":4.14,"storage_mcm":43.21},{"z_m":120,"area_km2":5.02,"storage_mcm":66.08},{"z_m":125,"area_km2":6.02,"storage_mcm":93.64},{"z_m":130,"area_km2":7.09,"storage_mcm":126.38},{"z_m":135,"area_km2":8.15,"storage_mcm":164.45},{"z_m":140,"area_km2":9.27,"storage_mcm":207.97},{"z_m":145,"area_km2":10.49,"storage_mcm":257.34},{"z_m":150,"area_km2":12.18,"storage_mcm":313.96},{"z_m":155,"area_km2":13.87,"storage_mcm":379.04},{"z_m":160,"area_km2":15.53,"storage_mcm":452.5},{"z_m":165,"area_km2":17.41,"storage_mcm":534.81},{"z_m":170,"area_km2":19.42,"storage_mcm":626.83},{"z_m":175,"area_km2":21.52,"storage_mcm":729.14},{"z_m":180,"area_km2":23.66,"storage_mcm":842.05},{"z_m":185,"area_km2":25.98,"storage_mcm":966.1},{"z_m":190,"area_km2":28.75,"storage_mcm":1102.87},{"z_m":195,"area_km2":31.11,"storage_mcm":1252.48},{"z_m":200,"area_km2":33.81,"storage_mcm":1414.73}],"demo":{"level":169.2,"inflow":185,"turbine":90,"spill":0,"gate":0,"delta24":0.19}}],"downstream_gauges":[{"code":"HOIKHACH","name":"Hội Khách","alarm_level_1":14.5,"alarm_level_2":15.5,"alarm_level_3":16.5,"peak_2025_m":19.32,"peak_time":"22:00 29/10/2025","min_scale":11.5,"max_scale":20.5,"demo":{"level":15.1,"delta3h":0.12},"level_source":"User provided downstream alert thresholds and 2025 peak screenshot (2026-10-14)"},{"code":"AINGHIA","name":"Ái Nghĩa","alarm_level_1":6.5,"alarm_level_2":8.0,"alarm_level_3":9.0,"peak_2025_m":10.6,"peak_time":"02:00 30/10/2025","min_scale":3.5,"max_scale":11.5,"demo":{"level":7.2,"delta3h":0.07},"level_source":"User provided downstream alert thresholds and 2025 peak screenshot (2026-10-14)"}],"flood_rules":{"season_early":"01/09-15/11","season_late":"16/11-15/12","tables":{"AVUONG":{"early_highest":376.0,"late_highest_range":[377.0,380.0],"early_min_receive":370.0,"late_min_receive":377.0},"DAKMI4":{"early_highest":255.0,"late_highest_range":[256.0,258.0],"early_min_receive":251.5,"late_min_receive":256.0},"SONGBUNG4":{"early_highest":217.5,"late_highest_range":[218.5,222.5],"early_min_receive":216.0,"late_min_receive":218.5},"SONGTRANH2":{"early_highest":172.0,"late_highest_range":[173.0,175.0],"early_min_receive":165.0,"late_min_receive":173.0}},"source_pdf_page":5},"dry_season_ranges":[{"from":"16/12","to":"20/12","levels":{"AVUONG":[375.5,378.3],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.4,173.5],"SONGBUNG4":[218.0,219.6]}},{"from":"21/12","to":"31/12","levels":{"AVUONG":[375.5,378.3],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.4,173.5],"SONGBUNG4":[218.0,219.6]}},{"from":"01/01","to":"10/01","levels":{"AVUONG":[375.5,378.3],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.4,173.5],"SONGBUNG4":[218.0,219.6]}},{"from":"11/01","to":"20/01","levels":{"AVUONG":[375.5,378.3],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.4,173.5],"SONGBUNG4":[218.0,219.6]}},{"from":"21/01","to":"31/01","levels":{"AVUONG":[375.5,378.3],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.4,173.5],"SONGBUNG4":[218.0,219.6]}},{"from":"01/02","to":"10/02","levels":{"AVUONG":[375.5,378.3],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.4,173.5],"SONGBUNG4":[218.0,219.6]}},{"from":"11/02","to":"20/02","levels":{"AVUONG":[375.2,378.1],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.3,173.4],"SONGBUNG4":[218.0,219.6]}},{"from":"21/02","to":"28/02 (29/02)","levels":{"AVUONG":[374.5,377.6],"DAKMI4":[254.7,256.4],"SONGTRANH2":[171.2,173.3],"SONGBUNG4":[218.0,219.6]}},{"from":"01/03","to":"10/03","levels":{"AVUONG":[373.7,377.0],"DAKMI4":[254.7,256.4],"SONGTRANH2":[170.8,172.9],"SONGBUNG4":[217.8,219.4]}},{"from":"11/03","to":"20/03","levels":{"AVUONG":[372.9,376.0],"DAKMI4":[254.7,256.4],"SONGTRANH2":[170.3,172.3],"SONGBUNG4":[217.6,219.2]}},{"from":"21/03","to":"31/03","levels":{"AVUONG":[371.9,374.9],"DAKMI4":[254.6,256.2],"SONGTRANH2":[169.5,171.6],"SONGBUNG4":[217.4,218.9]}},{"from":"01/04","to":"10/04","levels":{"AVUONG":[370.8,373.4],"DAKMI4":[254.3,255.9],"SONGTRANH2":[169.1,171.3],"SONGBUNG4":[217.0,218.6]}},{"from":"11/04","to":"20/04","levels":{"AVUONG":[369.4,372.2],"DAKMI4":[253.9,255.5],"SONGTRANH2":[168.3,170.5],"SONGBUNG4":[216.6,218.2]}},{"from":"21/04","to":"30/04","levels":{"AVUONG":[368.5,371.3],"DAKMI4":[253.6,255.1],"SONGTRANH2":[167.6,169.8],"SONGBUNG4":[216.3,217.9]}},{"from":"01/05","to":"10/05","levels":{"AVUONG":[367.4,370.6],"DAKMI4":[253.3,254.8],"SONGTRANH2":[167.0,169.0],"SONGBUNG4":[216.1,217.6]}},{"from":"11/05","to":"20/05","levels":{"AVUONG":[366.3,369.5],"DAKMI4":[253.1,254.6],"SONGTRANH2":[166.3,168.1],"SONGBUNG4":[215.7,217.1]}},{"from":"21/05","to":"31/05","levels":{"AVUONG":[364.1,366.8],"DAKMI4":[252.5,253.8],"SONGTRANH2":[163.1,164.9],"SONGBUNG4":[214.7,216.1]}},{"from":"01/06","to":"10/06","levels":{"AVUONG":[361.5,363.7],"DAKMI4":[251.5,252.7],"SONGTRANH2":[159.6,161.2],"SONGBUNG4":[213.5,215.2]}},{"from":"11/06","to":"20/06","levels":{"AVUONG":[358.5,360.8],"DAKMI4":[250.1,251.4],"SONGTRANH2":[156.3,157.4],"SONGBUNG4":[212.5,214.1]}},{"from":"21/06","to":"30/06","levels":{"AVUONG":[356.3,359.2],"DAKMI4":[248.6,250.0],"SONGTRANH2":[154.8,155.9],"SONGBUNG4":[211.3,212.8]}},{"from":"01/07","to":"10/07","levels":{"AVUONG":[354.8,357.1],"DAKMI4":[247.5,248.9],"SONGTRANH2":[152.9,154.1],"SONGBUNG4":[210.8,212.0]}},{"from":"11/07","to":"20/07","levels":{"AVUONG":[352.8,354.9],"DAKMI4":[246.5,247.9],"SONGTRANH2":[151.1,152.3],"SONGBUNG4":[210.1,211.2]}},{"from":"21/07","to":"31/07","levels":{"AVUONG":[351.3,353.0],"DAKMI4":[245.3,246.7],"SONGTRANH2":[149.5,150.7],"SONGBUNG4":[209.2,210.4]}},{"from":"01/08","to":"10/08","levels":{"AVUONG":[348.9,350.7],"DAKMI4":[243.8,245.4],"SONGTRANH2":[147.5,148.8],"SONGBUNG4":[208.6,209.8]}},{"from":"11/08","to":"20/08","levels":{"AVUONG":[346.1,348.0],"DAKMI4":[242.4,244.0],"SONGTRANH2":[145.7,147.0],"SONGBUNG4":[207.5,208.7]}},{"from":"21/08","to":"31/08","levels":{"AVUONG":[343.3,345.4],"DAKMI4":[240.5,242.5],"SONGTRANH2":[143.2,145.1],"SONGBUNG4":[206.3,207.5]}}],"engineering_notes":["Z-F-W là bảng điểm mốc gốc, nội suy tuyến tính giữa hai mốc lân cận; tuyệt đối không ngoại suy nếu vượt miền dữ liệu.","Một cửa van cung/y lanh màu vàng trong SVG là ký hiệu trực quan, không đại diện đầy đủ số lượng khoang tràn ngoài thực tế.","Ngưỡng tràn công trình khác với mực nước vận hành/đón lũ. Van đóng mở và Q xả phải lấy từ số liệu hoặc trạng thái công trình, không tự suy từ mực nước.","Dung tích hữu ích khả dụng = max(0, W(Z)-W(MNC)); dung tích trống = max(0, W(MNDBT)-W(Z)); phần trăm hữu ích đã tích = max(0,W(Z)-W(MNC))/Whi.","Không suy diễn mực nước Hội Khách/Ái Nghĩa từ tổng Q xả 4 hồ; cần quan trắc hoặc mô hình hạ du."]}</script>
 <script>
 (()=>{
@@ -1122,8 +1339,45 @@ button:disabled{cursor:not-allowed;opacity:.5}
  }
  function v9Fullscreen(el){if(document.fullscreenElement){document.exitFullscreen();return;}if(el?.requestFullscreen)el.requestFullscreen().catch(()=>{});}
 
+ // V9.3 - Sơ đồ lưu vực SVG: reuse LIVE reservoir and gauge objects from this dashboard.
+ // Never estimate river discharge/station level from upstream volumes.
+ function updateBasinMap(){
+   const root=byId('view-basin');if(!root)return;
+   for(const card of root.querySelectorAll('[data-basin-code]')){
+     const code=card.dataset.basinCode, isDam=card.dataset.basinType==='reservoir';
+     const o=isDam?reservoirs.find(x=>x.code===code):gauges.find(x=>x.code===code);
+     if(!o)continue;
+     const field=(k)=>card.querySelector('[data-field="'+k+'"]');
+     const set=(k,v)=>{const el=field(k);if(el)el.textContent=v;};
+     set('level',nfmt(o.reading.level));
+     if(isDam){set('inflow',nfmt(o.reading.inflow));set('turbine',nfmt(o.reading.turbine));set('spill',nfmt(o.reading.spill));}
+     else{set('forecast',nfmt(o.reading.forecast4h));}
+     const tag=field('status');if(tag){
+       const src=o.source;tag.className='basin-node-tag '+(src==='live'?'':src==='stale'?'is-stale':'is-missing');
+       tag.textContent=src==='live'?'LIVE':src==='stale'?'SỐ LIỆU CŨ':src==='time_error'?'LỖI GIỜ':src==='missing'?'CHƯA CÓ': 'ĐANG TẢI';
+       if(!isDam&&src==='live'&&warning(o).severity>=1){tag.textContent=warning(o).label;tag.style.background='#77482e';tag.style.borderColor='#d8a05d';tag.style.color='#ffefd5';}
+       else{tag.style.background='';tag.style.borderColor='';tag.style.color='';}
+     }
+     const stamp=o.updatedAt?formatObsTime(o.updatedAt):'Chưa có số liệu';
+     set('stamp',isDam?'PCTT Đà Nẵng · '+stamp:'PCTT → Supabase · '+stamp);
+     card.title=o.displayName+' · '+(o.reading.level==null?'Chưa có mực nước':nfmt(o.reading.level)+' m')+' · '+(o.updatedAt?formatObsTime(o.updatedAt):'không có thời gian');
+   }
+ }
+ function openBasinGaugeDialog(code){
+   const g=gauges.find(x=>x.code===code);if(!g)return;
+   const w=warning(g),v=g.reading.level,f=g.reading.forecast4h;
+   byId('basinGaugeTitle').textContent=g.displayName;
+   byId('basinGaugeSubtitle').textContent='Nguồn: PCTT Đà Nẵng → Supabase · '+(g.updatedAt?formatObsTime(g.updatedAt):'chưa có thời gian');
+   byId('basinGaugeLevel').textContent=nfmt(v)+' m';
+   const list=[['Biến thiên 3 giờ',g.reading.delta3h==null?'—':(g.reading.delta3h>=0?'+':'')+nfmt(g.reading.delta3h)+' m'],['Dự báo +4 giờ',nfmt(f)+' m'],['Báo động I',nfmt(g.alarm_level_1)+' m'],['Báo động II',nfmt(g.alarm_level_2)+' m'],['Báo động III',nfmt(g.alarm_level_3)+' m'],['Đỉnh lịch sử 2025',nfmt(g.peak_2025_m)+' m']];
+   byId('basinGaugeRows').innerHTML=list.map(([k,val])=>'<div>'+escapeHtml(k)+'<b>'+escapeHtml(val)+'</b></div>').join('');
+   const target=g.reading.forecast4hAt?' Mốc dự báo '+formatObsTime(g.reading.forecast4hAt)+'.':'';
+   byId('basinGaugeStatus').textContent='Trạng thái: '+w.label+'. '+(g.source==='live'?'Số liệu được đánh dấu mới theo kiểm tra thời gian.':'Cần kiểm tra thời gian và nguồn quan trắc.')+target+' Dự báo mô hình chỉ có giá trị tham khảo.';
+   const dlg=byId('basinGaugeDialog');if(!dlg.open)dlg.showModal();
+ }
+
  function activateTab(tab){
-   const allowed=['overview','data','charts','flood','weather'];
+   const allowed=['overview','data','charts','basin','flood','weather'];
    activeTab=allowed.includes(tab)?tab:'overview';
    for(const view of document.querySelectorAll('.site-view'))view.hidden=view.id!=='view-'+activeTab;
    for(const b of document.querySelectorAll('.site-tab')){
@@ -1131,6 +1385,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
    }
    if(activeTab==='data')renderDataTables();
    if(activeTab==='charts')renderCharts();
+   if(activeTab==='basin')updateBasinMap();
    if(activeTab==='flood'){updateFloodGaugePanel();ensureFloodMap();}
    if(activeTab==='weather')ensureWindyMap();
  }
@@ -1139,6 +1394,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
    byId('reservoirs').innerHTML=reservoirs.map(reservoirCard).join('');
    byId('gauges').innerHTML=gauges.map(gaugeCard).join('');
    renderDataTables();
+   updateBasinMap();
    if(activeTab==='charts')renderCharts();
    if(activeTab==='flood')updateFloodGaugePanel();
    const all=[...reservoirs,...gauges];
@@ -1154,17 +1410,39 @@ button:disabled{cursor:not-allowed;opacity:.5}
  function updateDetail(code){
   const r=reservoirs.find(r=>r.code===code);if(!r)return;
   const m=metrics(r),flood=floodLevel(r),gate=effectiveGate(r),z=r.reading.level,qspill=spillNow(r);
-  const fmtMetric=(label,value,unit='')=>`<div class="detail-kpi"><div class="lb">${label}</div><b>${value==null?'—':nfmt(value)} ${unit}</b></div>`;
-  const diff=(z,val)=>z==null?'—':(z>=val?'+':'−')+nfmt(Math.abs(z-val))+' m';
+  const value=(v,d=2)=>v==null?'—':nfmt(v,d);
+  const kpi=(cls,label,val,unit='',note='')=>`<div class="detail-kpi ${cls}"><div class="lb">${label}</div><b>${val}<span class="unit">${unit}</span></b>${note?`<div class="detail-data-note">${note}</div>`:''}</div>`;
+  const relation=(now,target,belowLabel,aboveLabel)=>{
+    if(now==null||target==null)return{label:belowLabel,val:'—'};
+    const d=Math.abs(now-target);
+    return now>=target?{label:aboveLabel,val:nfmt(d)+' m'}:{label:belowLabel,val:nfmt(d)+' m'};
+  };
+  const crestRel=relation(z,r.spillway_crest_m,'Còn đến ngưỡng tràn','Cao hơn ngưỡng tràn');
+  const normalRel=relation(z,r.mndbt,'Còn đến MNDBT','Cao hơn MNDBT');
+  const gateValue=gate==null?'—':nfmt(gate);
   byId('detailContent').innerHTML=`<div class="detail-head"><div><h2>Mặt cắt hồ thủy điện ${r.name}</h2><p>Mẫu hình thống nhất · 01 van cung mô phỏng + 01 xy lanh vàng · Ngưỡng tràn ${nfmt(r.spillway_crest_m)} m</p></div><button class="btn" id="detailClose">✕ Đóng</button></div>
-   <div class="detail-main"><div class="detail-visual">${reservoirSVG(r,r.code+'detail')}</div><div class="detail-kpis">
-   ${fmtMetric('Mực nước hiện tại',z,'m')}
-   <div class="detail-kpi"><div class="lb">Q về / Q qua máy / Q xả tràn</div><b style="font-size:17px">${nfmt(r.reading.inflow)} / ${nfmt(r.reading.turbine)} / ${nfmt(qspill)} <span style="font-size:12px">m³/s</span></b></div>
-   <div class="detail-kpi"><div class="lb">Hữu ích hiện tại / Trống đến MNDBT</div><b style="font-size:18px">${m?nfmt(m.useful):'—'} / ${m?nfmt(m.free):'—'} <span style="font-size:12px">triệu m³</span></b></div>
-   <div class="detail-kpi"><div class="lb">Chênh ngưỡng tràn / MNDBT</div><b style="font-size:17px">${diff(z,r.spillway_crest_m)} / ${diff(z,r.mndbt)}</b></div>
-   <div class="detail-kpi"><div class="lb">MNC / Tràn / Đón lũ / MNDBT</div><b style="font-size:15px">${nfmt(r.mnc)} · ${nfmt(r.spillway_crest_m)} · ${nfmt(flood.value)} · ${nfmt(r.mndbt)} m</b></div>
-   ${fmtMetric('Độ mở van thực (chưa kết nối)',gate,'%')}
-   </div></div>
+   <div class="detail-main">
+    <div class="detail-left">
+     <div class="detail-visual">${reservoirSVG(r,r.code+'detail')}</div>
+     <div class="detail-levels" aria-label="Các mốc cao trình hồ">
+      <div class="detail-ref-card mnc"><span class="lb">Mực nước chết (MNC)</span><b>${nfmt(r.mnc)} m</b></div>
+      <div class="detail-ref-card spill"><span class="lb">Ngưỡng tràn</span><b>${nfmt(r.spillway_crest_m)} m</b></div>
+      <div class="detail-ref-card flood"><span class="lb">Mực nước đón lũ</span><b>${nfmt(flood.value)} m</b></div>
+      <div class="detail-ref-card mndbt"><span class="lb">MNDBT</span><b>${nfmt(r.mndbt)} m</b></div>
+     </div>
+    </div>
+    <div class="detail-kpis">
+     ${kpi('detail-level-card','Mực nước hồ hiện tại',value(z),'m')}
+     ${kpi('tone-inflow','Q về hồ',value(r.reading.inflow),'m³/s')}
+     ${kpi('tone-turbine','Q qua máy',value(r.reading.turbine),'m³/s')}
+     ${kpi('tone-spill','Q xả tràn',value(qspill),'m³/s')}
+     ${kpi('tone-gate','Độ mở van thực',gateValue,gate==null?'':'%',gate==null?'Chưa có dữ liệu đo độ mở van':'' )}
+     ${kpi('tone-useful','Dung tích hữu ích hiện tại',m?value(m.useful):'—','triệu m³')}
+     ${kpi('tone-free','Dung tích trống đến MNDBT',m?value(m.free):'—','triệu m³')}
+     ${kpi('tone-crest',crestRel.label,crestRel.val)}
+     ${kpi('tone-normal',normalRel.label,normalRel.val)}
+    </div>
+   </div>
    <p class="detail-desc">Đồ họa dùng chung một hình mặt cắt nhằm so sánh bốn hồ, chiều cao được chuẩn hóa theo các mốc và không phải bản vẽ theo tỷ lệ. Các giá trị mực nước, MNDBT, MNC, ngưỡng tràn lấy từ dữ liệu kỹ thuật; dung tích nội suy tuyến tính từ bảng Z–W Phụ lục II QĐ 1865/QĐ-TTg. Hình một cửa van và một xy lanh là tượng trưng. Các giá trị MNH và Q đang đọc từ nguồn LIVE khi có kết nối. Độ mở van chưa có tín hiệu thực; nếu Q xả > 0, chuyển động nhỏ của cánh van chỉ là minh họa trạng thái xả, không phải vị trí/độ mở đo được.</p>`;
   byId('detailClose').addEventListener('click',()=>byId('detailDialog').close());
  }
@@ -1500,6 +1778,62 @@ button:disabled{cursor:not-allowed;opacity:.5}
      e.preventDefault();list[i].focus();activateTab(list[i].dataset.view);
    });
  }
+
+ // V9.4: markers and dam icons are anchored to network nodes, not to card positions.
+ window.AVC_BASIN_TOPOLOGY=JSON.parse(byId('basinTopologyConfig').textContent);
+ const basinSvg=byId('basinNetworkSVG');
+ function openBasinAnchor(el){
+   if(!el)return;
+   if(el.dataset.basinKind==='reservoir')openDetail(el.dataset.basinOpen);
+   else openBasinGaugeDialog(el.dataset.basinOpen);
+ }
+ basinSvg.addEventListener('click',e=>openBasinAnchor(e.target.closest('[data-basin-open]')));
+ basinSvg.addEventListener('keydown',e=>{
+   if((e.key==='Enter'||e.key===' ')&&e.target.closest('[data-basin-open]')){
+     e.preventDefault();openBasinAnchor(e.target.closest('[data-basin-open]'));
+   }
+ });
+ // Draw direction arrows using actual river-path tangents. No detached/misaligned arrows.
+ const arrowHost=byId('b94FlowArrows');
+ for(const id of ['bung4_join','bung_5','av_join','dakmi','cai_2','vugia_con','vugia_split','vugia_an','connector','yen','han','tb_2','tb_3','tb_4']){
+   const path=byId('b94-edge-'+id);if(!path)continue;
+   const len=path.getTotalLength(),d=len*.62,p=path.getPointAtLength(d),p0=path.getPointAtLength(Math.max(0,d-2));
+   const angle=Math.atan2(p.y-p0.y,p.x-p0.x)*180/Math.PI;
+   const a=document.createElementNS('http://www.w3.org/2000/svg','path');
+   a.setAttribute('d','M-5 -4L2 0 -5 4');a.setAttribute('fill','none');a.setAttribute('stroke','#e9fdff');a.setAttribute('stroke-width','1.6');a.setAttribute('stroke-linecap','round');a.setAttribute('stroke-linejoin','round');
+   a.setAttribute('transform',`translate(${p.x} ${p.y}) rotate(${angle})`);arrowHost.appendChild(a);
+ }
+
+ // V9.3 map UI controls
+ for(const node of document.querySelectorAll('.basin-node[data-basin-code]')){
+   node.addEventListener('click',()=>{
+     const code=node.dataset.basinCode;
+     if(node.dataset.basinType==='reservoir')openDetail(code);
+     else openBasinGaugeDialog(code);
+   });
+ }
+ let basinMotionEnabled=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!basinMotionEnabled)byId('basinMapFrame').classList.add('basin-still');
+ byId('basinMotionBtn').setAttribute('aria-pressed',String(basinMotionEnabled));
+ byId('basinMotionBtn').textContent=basinMotionEnabled?'◉ Dòng chảy minh họa: Bật':'◯ Dòng chảy minh họa: Tắt';
+ byId('basinMotionBtn').addEventListener('click',()=>{
+   basinMotionEnabled=!basinMotionEnabled;
+   byId('basinMapFrame').classList.toggle('basin-still',!basinMotionEnabled);
+   byId('basinMotionBtn').setAttribute('aria-pressed',String(basinMotionEnabled));
+   byId('basinMotionBtn').textContent=basinMotionEnabled?'◉ Dòng chảy minh họa: Bật':'◯ Dòng chảy minh họa: Tắt';
+ });
+ let basinCardsVisible=true;
+ byId('basinCardsBtn').addEventListener('click',()=>{
+   basinCardsVisible=!basinCardsVisible;
+   byId('basinMapFrame').classList.toggle('basin-hide-cards',!basinCardsVisible);
+   byId('basinCardsBtn').setAttribute('aria-pressed',String(basinCardsVisible));
+   byId('basinCardsBtn').textContent=basinCardsVisible?'▣ Thẻ số liệu: Hiện':'▣ Thẻ số liệu: Ẩn';
+ });
+ byId('basinFullscreenBtn').addEventListener('click',()=>v9Fullscreen(byId('basinMapFrame')));
+ byId('basinExitFullscreen').addEventListener('click',()=>document.exitFullscreen?.());
+ byId('basinGaugeClose').addEventListener('click',()=>byId('basinGaugeDialog').close());
+ byId('basinGaugeDialog').addEventListener('click',e=>{if(e.target===byId('basinGaugeDialog'))byId('basinGaugeDialog').close();});
+
  byId('floodReload').addEventListener('click',()=>ensureFloodMap(true));
  byId('floodFullscreenBtn').addEventListener('click',()=>v9Fullscreen(byId('floodEmbedContainer')));
  byId('windyFullscreenBtn').addEventListener('click',()=>v9Fullscreen(byId('windyEmbedContainer')));
